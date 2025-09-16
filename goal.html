@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Inventory System — Stock Goals</title>
+
+<script>
+  const AUTH_OK   = localStorage.getItem('auth_v1') === 'ok';
+  const AUTH_USER = localStorage.getItem('auth_user');
+  const AUTH_ROLE = localStorage.getItem('auth_role');
+  if (!AUTH_OK || !AUTH_USER) { window.location.replace('login.html'); }
+  else if (AUTH_ROLE === 'viewer') { window.location.replace('viewer.html'); }
+  function logout(){
+    localStorage.removeItem('auth_v1'); localStorage.removeItem('auth_user');
+    localStorage.removeItem('auth_role'); localStorage.removeItem('auth_time');
+    window.location.replace('login.html');
+  }
+</script>
+
+<style>
+  /* ==== Light theme based on #F7F4EA ==== */
+  :root{
+    --nav-w:260px;
+
+    /* Theme */
+    --bg:#F7F4EA;        /* paper background */
+    --panel:#EEE6D8;     /* cards / panels */
+    --ink:#1F2937;       /* primary text */
+    --muted:#6B7280;     /* muted text */
+    --line:#D9CFC1;      /* borders/outlines */
+    --accent:#0EA5A4;    /* teal accent */
+    --chip:#EDE7DA;      /* chips/pills */
+  }
+
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink)
+  }
+  h2{color:var(--ink)}
+  .content{padding:20px;padding-top:80px;min-height:100vh;box-sizing:border-box}
+
+  input,button,select,textarea{
+    padding:8px;margin:4px;font-family:inherit;
+    color:var(--ink);
+    background:var(--panel);
+    border:1px solid var(--line);
+    caret-color:var(--ink);
+  }
+  input::placeholder, textarea::placeholder{ color:var(--muted); opacity:1 }
+
+  button{
+    border-radius:8px;
+    cursor:pointer;
+  }
+  button:hover{
+    background:var(--accent);
+    color:#ffffff;
+    border-color:var(--accent);
+  }
+
+  table{width:100%;margin-top:12px;border-collapse:collapse;background:var(--panel);border:1px solid var(--line)}
+  thead th{
+    background:#F0E8DB;
+    color:var(--muted);
+    border-bottom:1px solid var(--line);
+  }
+  th,td{padding:10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  tbody tr:hover{background:#F3ECDD}
+
+  #menu-check{display:none}
+  .hamburger{
+    position:fixed;left:12px;top:12px;width:32px;display:flex;flex-direction:column;gap:7px;
+    cursor:pointer;user-select:none;z-index:1200;transition:transform .3s
+  }
+  .hamburger .bar{
+    height:3px;background:var(--ink);border-radius:10px;
+    transition:transform .35s,opacity .25s,width .35s
+  }
+  .hamburger .bar1,.hamburger .bar3{width:18px}.hamburger .bar2{width:28px}
+  #menu-check:checked+label.hamburger{transform:translateX(var(--nav-w))}
+  #menu-check:checked+label.hamburger .bar1{transform:translateY(10px) rotate(45deg);width:28px}
+  #menu-check:checked+label.hamburger .bar2{opacity:0}
+  #menu-check:checked+label.hamburger .bar3{transform:translateY(-10px) rotate(-45deg);width:28px}
+
+  .sidebar{
+    position:fixed;inset:0 auto 0 0;width:var(--nav-w);
+    background:var(--panel);padding:20px;box-sizing:border-box;
+    transform:translateX(-100%);transition:.3s;z-index:1100;overflow:auto;
+    border-right:1px solid var(--line);
+    box-shadow:0 10px 30px rgba(0,0,0,.08)
+  }
+  .sidebar a,.sidebar button{
+    display:block;width:100%;margin-bottom:10px;padding:10px;text-align:left;
+    border-radius:8px;text-decoration:none;color:inherit;border:1px solid var(--line);
+    background:transparent
+  }
+  .sidebar a:hover{background:var(--accent);color:#ffffff;border-color:var(--accent)}
+  #menu-check:checked~.sidebar{transform:translateX(0)}
+  label.overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;visibility:hidden;transition:.3s;z-index:1090}
+  #menu-check:checked~label.overlay{opacity:1;visibility:visible}
+
+  .toast-wrap{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:10000}
+  .toast{background:#E9E2D6;color:var(--ink);padding:10px 12px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.12)}
+  .toast--warn{background:#F2C97D;color:#4A2E00}.toast--error{background:#F3B8B8;color:#711313}.toast__close{margin-left:12px;cursor:pointer;font-weight:700}
+</style>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<input id="menu-check" type="checkbox" />
+<label for="menu-check" class="hamburger" aria-label="Toggle menu" aria-controls="side" role="button" tabindex="0">
+  <span class="bar bar1"></span><span class="bar bar2"></span><span class="bar bar3"></span>
+</label>
+
+<nav class="sidebar" id="side" role="navigation" aria-label="Main">
+  <a href="index.html">Add New Stock</a>
+  <a href="adjust.html">Adjust Stock</a>
+  <a href="location.html">Location</a>
+  <a href="goal.html">Set Stock Count Goal</a>
+  <a href="history.html">History</a>
+  <a href="status.html">Status</a>
+  <hr>
+  <button onclick="logout()">Logout</button>
+</nav>
+<label class="overlay" for="menu-check" aria-hidden="true"></label>
+
+<div class="toast-wrap" id="toast-wrap" aria-live="polite" aria-atomic="true"></div>
+
+<main class="content">
+  <section aria-labelledby="goalPageTitle">
+    <h2 id="goalPageTitle">Set Stock Count Goal</h2>
+    <table id="goalTable" aria-describedby="goalTableHelp">
+      <thead>
+        <tr>
+          <th scope="col">Item Name</th>
+          <th scope="col">Current Goal</th>
+          <th scope="col">New Goal</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <p id="goalTableHelp" style="color:var(--muted);margin-top:8px">
+      Press Enter inside the New Goal field to save quickly.
+    </p>
+
+    <!-- Graph container -->
+    <canvas id="goalChart" style="margin-top:30px;max-height:400px"></canvas>
+  </section>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import { getFirestore, collection, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAL_C_bGiD-G_2g1jro7-OzxIlM0akRdTY",
+    authDomain: "epedu-inventory-database.firebaseapp.com",
+    projectId: "epedu-inventory-database",
+    storageBucket: "epedu-inventory-database.appspot.com",
+    messagingSenderId: "124437251040",
+    appId: "1:124437251040:web:4989c73efc2f4afbf22185",
+    measurementId: "G-GFEEP49VRP"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  try { getAnalytics(app); } catch(e) {}
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+  signInAnonymously(auth).catch(console.error);
+
+  const menuCheck = document.getElementById('menu-check');
+  const hamb = document.querySelector('label.hamburger');
+  function syncAria(){ hamb.setAttribute('aria-expanded', String(menuCheck.checked)); }
+  menuCheck.addEventListener('change', syncAria); syncAria();
+
+  const toastWrap = document.getElementById('toast-wrap');
+  function toast(msg, type='info', timeout=3200){
+    const el = document.createElement('div');
+    el.className = 'toast' + (type==='warn' ? ' toast--warn' : type==='error' ? ' toast--error' : '');
+    el.innerHTML = `${escapeHtml(msg)} <span class="toast__close" aria-label="Dismiss" role="button">×</span>`;
+    toastWrap.appendChild(el);
+    const close = ()=>{ if (el && el.parentNode) el.parentNode.removeChild(el); };
+    el.querySelector('.toast__close').addEventListener('click', close);
+    if (timeout>0) setTimeout(close, timeout);
+  }
+  const notify = toast;
+  function escapeHtml(s){ return (s ?? '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+  const colInventory = collection(db, "inventory");
+  let inventory = [];
+  onSnapshot(colInventory, (snap) => {
+    inventory = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    renderGoalTable();
+  });
+
+  function renderGoalTable(){
+    const tbody = document.querySelector('#goalTable tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const rows = inventory.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+    for (const item of rows){
+      const currentGoal = Number.isFinite(item.goal) ? item.goal : 0;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(item.name || '')}</td>
+        <td>${currentGoal}</td>
+        <td>
+          <input
+            type="number" min="0" step="1" value="${currentGoal}"
+            inputmode="numeric" data-goal-input="${item.id}" aria-label="New goal for ${escapeHtml(item.name || '')}"
+            style="width:140px"
+          >
+        </td>
+        <td>
+          <button data-save-goal="${item.id}" aria-label="Save goal for ${escapeHtml(item.name || '')}">Save</button>
+          <button data-clear-goal="${item.id}" title="Set goal to 0" aria-label="Clear goal for ${escapeHtml(item.name || '')}">Clear</button>
+        </td>`;
+      tbody.appendChild(tr);
+    }
+
+    tbody.querySelectorAll('[data-save-goal]').forEach(btn=>{
+      btn.addEventListener('click', async e=>{
+        const id = e.currentTarget.getAttribute('data-save-goal');
+        const input = tbody.querySelector(`[data-goal-input="${id}"]`);
+        const raw = (input?.value ?? '').trim();
+        const valNum = parseInt(raw,10);
+        const val = Number.isFinite(valNum) && valNum >= 0 ? valNum : 0;
+        try{
+          await updateDoc(doc(db,'inventory', id), { goal: val });
+          notify('Goal saved');
+        }catch(err){
+          console.error(err); notify('Failed to save goal','error');
+        }
+      });
+    });
+
+    tbody.querySelectorAll('[data-clear-goal]').forEach(btn=>{
+      btn.addEventListener('click', async e=>{
+        const id = e.currentTarget.getAttribute('data-clear-goal');
+        try{
+          await updateDoc(doc(db,'inventory', id), { goal: 0 });
+          notify('Goal cleared');
+        }catch(err){
+          console.error(err); notify('Failed to clear goal','error');
+        }
+      });
+    });
+
+    tbody.querySelectorAll('[data-goal-input]').forEach(inp=>{
+      inp.addEventListener('keydown', e=>{
+        if (e.key === 'Enter'){
+          e.preventDefault();
+          const id = e.currentTarget.getAttribute('data-goal-input');
+          tbody.querySelector(`[data-save-goal="${id}"]`)?.click();
+        }
+      });
+    });
+
+    // render chart too
+    renderGoalChart();
+  }
+
+  let goalChart;
+  function renderGoalChart() {
+    const ctx = document.getElementById('goalChart');
+    if (!ctx) return;
+
+    const rows = inventory.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+    const labels = rows.map(item => item.name || '');
+    const goals  = rows.map(item => Number.isFinite(item.goal) ? item.goal : 0);
+
+    if (goalChart) {
+      goalChart.data.labels = labels;
+      goalChart.data.datasets[0].data = goals;
+      goalChart.update();
+    } else {
+      goalChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Stock Goals',
+            data: goals,
+            backgroundColor: '#0EA5A4'
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: 'Stock Goals Overview'
+            }
+          },
+          scales: {
+            y: { beginAtZero: true, ticks: { precision:0 } }
+          }
+        }
+      });
+    }
+  }
+</script>
+</body>
+</html>
