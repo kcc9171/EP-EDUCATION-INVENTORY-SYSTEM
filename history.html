@@ -22,41 +22,65 @@
   /* ==== Light theme based on #F7F4EA ==== */
   :root{
     --nav-w:260px;
-    --bg:#F7F4EA;
-    --panel:#EEE6D8;
-    --ink:#1F2937;
-    --muted:#6B7280;
-    --line:#D9CFC1;
-    --accent:#0EA5A4;
-    --chip:#EDE7DA;
+
+    /* Theme */
+    --bg:#F7F4EA;        /* paper background */
+    --panel:#EEE6D8;     /* cards / panels */
+    --ink:#1F2937;       /* primary text */
+    --muted:#6B7280;     /* muted text */
+    --line:#D9CFC1;      /* borders/outlines */
+    --accent:#0EA5A4;    /* teal accent */
+    --chip:#EDE7DA;      /* pills/chips */
   }
 
   html,body{height:100%}
-  body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--ink)}
+  body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink)
+  }
   h2{color:var(--ink)}
   .muted{color:var(--muted)}
   .content{padding:20px;padding-top:80px;min-height:100vh;box-sizing:border-box}
 
+  /* Controls */
   input,button,select,textarea{
     padding:8px;margin:4px;font-family:inherit;
-    color:var(--ink);background:var(--panel);
-    border:1px solid var(--line);caret-color:var(--ink);
+    color:var(--ink);
+    background:var(--panel);
+    border:1px solid var(--line);
+    caret-color:var(--ink);
   }
-  input::placeholder,textarea::placeholder{color:var(--muted);opacity:1}
-  button{border-radius:8px;cursor:pointer}
-  button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  input::placeholder, textarea::placeholder{ color:var(--muted); opacity:1 }
 
+  button{ border-radius:8px; cursor:pointer; }
+  button:hover{ background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  /* Table */
   table{width:100%;margin-top:12px;border-collapse:collapse;background:var(--panel);border:1px solid var(--line)}
-  thead th{background:#F0E8DB;color:var(--muted);border-bottom:1px solid var(--line);white-space:nowrap}
+  thead th{
+    background:#F0E8DB;
+    color:var(--muted);
+    border-bottom:1px solid var(--line);
+    white-space:nowrap;
+  }
   th,td{padding:10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
   tbody tr:hover{background:#F3ECDD}
   .nowrap{white-space:nowrap}
 
   .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 16px}
-  .pill{display:inline-block;padding:4px 10px;border:1px solid var(--line);border-radius:999px;font-size:12px;color:var(--ink);background:var(--chip)}
+  .pill{
+    display:inline-block;padding:4px 10px;border:1px solid var(--line);
+    border-radius:999px;font-size:12px;color:var(--ink);background:var(--chip);
+  }
 
+  /* Sidebar + hamburger */
   #menu-check{display:none}
-  .hamburger{position:fixed;left:12px;top:12px;width:32px;display:flex;flex-direction:column;gap:7px;cursor:pointer;user-select:none;z-index:1200;transition:transform .3s}
+  .hamburger{
+    position:fixed;left:12px;top:12px;width:32px;display:flex;flex-direction:column;gap:7px;
+    cursor:pointer;user-select:none;z-index:1200;transition:transform .3s
+  }
   .hamburger .bar{height:3px;background:var(--ink);border-radius:10px;transition:transform .35s,opacity .25s,width .35s}
   .hamburger .bar1,.hamburger .bar3{width:18px}.hamburger .bar2{width:28px}
   #menu-check:checked+label.hamburger{transform:translateX(var(--nav-w))}
@@ -64,25 +88,36 @@
   #menu-check:checked+label.hamburger .bar2{opacity:0}
   #menu-check:checked+label.hamburger .bar3{transform:translateY(-10px) rotate(-45deg);width:28px}
 
-  .sidebar{position:fixed;inset:0 auto 0 0;width:var(--nav-w);background:var(--panel);padding:20px;box-sizing:border-box;
+  .sidebar{
+    position:fixed;inset:0 auto 0 0;width:var(--nav-w);
+    background:var(--panel);padding:20px;box-sizing:border-box;
     transform:translateX(-100%);transition:.3s;z-index:1100;overflow:auto;
-    border-right:1px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.08)}
-  .sidebar a,.sidebar button{display:block;width:100%;margin-bottom:10px;padding:10px;text-align:left;
-    border-radius:8px;text-decoration:none;color:inherit;border:1px solid var(--line);background:transparent}
+    border-right:1px solid var(--line);
+    box-shadow:0 10px 30px rgba(0,0,0,.08)
+  }
+  .sidebar a,.sidebar button{
+    display:block;width:100%;margin-bottom:10px;padding:10px;text-align:left;
+    border-radius:8px;text-decoration:none;color:inherit;border:1px solid var(--line);background:transparent
+  }
   .sidebar a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
   #menu-check:checked~.sidebar{transform:translateX(0)}
   label.overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;visibility:hidden;transition:.3s;z-index:1090}
   #menu-check:checked~label.overlay{opacity:1;visibility:visible}
 
+  /* Fancy input */
   .input-container{position:relative;margin:8px 4px;min-width:260px}
-  .input{width:100%;padding:10px;height:40px;border:2px solid var(--line);border-top:none;border-bottom:none;font-size:16px;background:transparent;outline:none;
-    box-shadow:7px 7px 0 0 var(--line);transition:.5s;box-sizing:border-box;color:var(--ink);caret-color:var(--ink)}
+  .input{
+    width:100%;padding:10px;height:40px;border:2px solid var(--line);
+    border-top:none;border-bottom:none;font-size:16px;background:transparent;outline:none;
+    box-shadow:7px 7px 0 0 var(--line);transition:.5s;box-sizing:border-box;color:var(--ink);caret-color:var(--ink);
+  }
   .topline,.underline{position:absolute;background-color:var(--line);height:2px;right:0;transition:.5s}
   .topline{width:0;top:0}.underline{width:0;bottom:0}
   .input:focus~.topline{width:35%}.input:focus~.underline{width:100%}
   .label{position:absolute;top:10px;left:10px;color:var(--ink);transition:.5s;transform:scale(0);z-index:-1;background:var(--bg);padding:0 4px}
   .input:focus~.label{top:-10px;transform:scale(1)}
 
+  /* Toasts */
   .toast-wrap{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:10000}
   .toast{background:#E9E2D6;color:var(--ink);padding:10px 12px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.12)}
   .toast--warn{background:#F2C97D;color:#4A2E00}.toast--error{background:#F3B8B8;color:#711313}.toast__close{margin-left:12px;cursor:pointer;font-weight:700}
@@ -148,20 +183,21 @@
 </main>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
   import {
     getFirestore, collection, doc, addDoc, updateDoc, deleteDoc,
     onSnapshot, serverTimestamp, query, orderBy, getDocs, writeBatch
-  } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  /* --- Firebase config (ep-education-inventory-system) --- */
+  /* 🔁 UPDATED: new Firebase project config */
   const firebaseConfig = {
     apiKey: "AIzaSyDcRIe_9vFcAhQgbwlhritecpj1iXtsv-M",
     authDomain: "ep-education-inventory-system.firebaseapp.com",
+    databaseURL: "https://ep-education-inventory-system-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "ep-education-inventory-system",
-    storageBucket: "ep-education-inventory-system.appspot.com",
+    storageBucket: "ep-education-inventory-system.firebasestorage.app",
     messagingSenderId: "378090475953",
     appId: "1:378090475953:web:7c80e4eb3646d64825ed90",
     measurementId: "G-BS11QEKE7Q"
@@ -173,129 +209,143 @@
   const db   = getFirestore(app);
   signInAnonymously(auth).catch(console.error);
 
-  const menuCheck=document.getElementById('menu-check');
-  const hamb=document.querySelector('label.hamburger');
+  /* Sidebar ARIA */
+  const menuCheck = document.getElementById('menu-check');
+  const hamb = document.querySelector('label.hamburger');
   function syncAria(){ hamb.setAttribute('aria-expanded', String(menuCheck.checked)); }
   menuCheck.addEventListener('change', syncAria); syncAria();
 
-  const toastWrap=document.getElementById('toast-wrap');
-  function toast(msg,type='info',timeout=3200){
-    const el=document.createElement('div');
-    el.className='toast'+(type==='warn'?' toast--warn':type==='error'?' toast--error':'');
-    el.innerHTML=`${escapeHtml(msg)} <span class="toast__close" aria-label="Dismiss" role="button">×</span>`;
+  /* Toasts */
+  const toastWrap = document.getElementById('toast-wrap');
+  function toast(msg, type='info', timeout=3200){
+    const el = document.createElement('div');
+    el.className = 'toast' + (type==='warn' ? ' toast--warn' : type==='error' ? ' toast--error' : '');
+    el.innerHTML = `${escapeHtml(msg)} <span class="toast__close" aria-label="Dismiss" role="button">×</span>`;
     toastWrap.appendChild(el);
-    const close=()=>{if(el&&el.parentNode)el.parentNode.removeChild(el);};
-    el.querySelector('.toast__close').addEventListener('click',close);
-    if(timeout>0)setTimeout(close,timeout);
+    const close = ()=>{ if (el && el.parentNode) el.parentNode.removeChild(el); };
+    el.querySelector('.toast__close').addEventListener('click', close);
+    if (timeout>0) setTimeout(close, timeout);
   }
-  const notify=toast;
+  const notify = toast;
 
-  function escapeHtml(s){return(s??'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-  function csvEscape(v){const s=(v??'').toString();return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
-  function toLocalDateTime(ts){if(!ts)return'';const d=ts.toDate?ts.toDate():new Date(ts);return isNaN(+d)?'':d.toLocaleString();}
+  /* Utils */
+  function escapeHtml(s){ return (s ?? '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+  function csvEscape(v){ const s = (v ?? '').toString(); return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s; }
+  function toLocalDateTime(ts){ if (!ts) return ''; const d = ts.toDate ? ts.toDate() : new Date(ts); return isNaN(+d)?'':d.toLocaleString(); }
 
-  const colAdjustments=collection(db,"adjustments");
-  let adjustments=[];
-  let unsubHistory=null;
+  const colAdjustments = collection(db, "adjustments");
+  let adjustments = [];
+  let unsubHistory = null;
 
   function attachHistoryListener(){
-    if(unsubHistory)return;
-    const qAdj=query(colAdjustments,orderBy("ts","desc"));
-    unsubHistory=onSnapshot(qAdj,(snap)=>{
-      adjustments=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if (unsubHistory) return;
+    const qAdj = query(colAdjustments, orderBy("ts","desc"));
+    unsubHistory = onSnapshot(qAdj, (snap) => {
+      adjustments = snap.docs.map(d => ({ id:d.id, ...d.data() }));
       populateHistoryFilters();
       renderHistory();
     });
   }
   attachHistoryListener();
 
-  function populateHistoryFilters(){
-    const sel=document.getElementById('hist-item-filter');if(!sel)return;
-    const current=sel.value;
-    const names=Array.from(new Set(adjustments.map(a=>a.item))).filter(Boolean).sort((a,b)=>a.localeCompare(b));
-    sel.innerHTML='<option value="">All items</option>'+names.map(n=>`<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
-    if([...sel.options].some(o=>o.value===current))sel.value=current;
-    sel.onchange=renderHistory;
-    const searchEl=document.getElementById('hist-search');
-    if(searchEl&&!searchEl._bound){searchEl._bound=true;searchEl.oninput=renderHistory;}
+  function populateHistoryFilters() {
+    const sel = document.getElementById('hist-item-filter'); if (!sel) return;
+    const current = sel.value;
+    const names = Array.from(new Set(adjustments.map(a => a.item))).filter(Boolean).sort((a,b)=>a.localeCompare(b));
+    sel.innerHTML = '<option value="">All items</option>' + names.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+    if ([...sel.options].some(o => o.value === current)) sel.value = current;
+    sel.onchange = renderHistory;
+
+    const searchEl = document.getElementById('hist-search');
+    if (searchEl && !searchEl._bound){ searchEl._bound=true; searchEl.oninput = renderHistory; }
   }
 
-  function renderHistory(){
-    const tbody=document.querySelector('#historyTable tbody');if(!tbody)return;
-    tbody.innerHTML='';
-    let rows=adjustments.slice();
-    const q=(document.getElementById('hist-search').value||'').trim().toLowerCase();
-    if(q)rows=rows.filter(r=>
-      (r.item||'').toLowerCase().includes(q)||
-      (r.actor||'').toLowerCase().includes(q)||
-      ((r.reason??r.purpose??'').toLowerCase().includes(q))||
-      ((r.takenBy??r.adjustedBy??r.forWhom??'').toLowerCase().includes(q))||
-      ((r.location??'').toLowerCase().includes(q))
+  function renderHistory() {
+    const tbody = document.querySelector('#historyTable tbody'); if (!tbody) return;
+    tbody.innerHTML = '';
+    let rows = adjustments.slice();
+
+    const q = (document.getElementById('hist-search').value || '').trim().toLowerCase();
+    if (q) rows = rows.filter(r =>
+      (r.item||'').toLowerCase().includes(q) ||
+      (r.actor||'').toLowerCase().includes(q) ||
+      ((r.reason ?? r.purpose ?? '').toLowerCase().includes(q)) ||
+      // include 'takenBy' in search as well
+      ((r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '').toLowerCase().includes(q)) ||
+      ((r.location ?? '').toLowerCase().includes(q))
     );
-    const itemFilter=document.getElementById('hist-item-filter').value;
-    if(itemFilter)rows=rows.filter(r=>r.item===itemFilter);
-    document.getElementById('hist-count').textContent=`${rows.length} record${rows.length===1?'':'s'}`;
-    for(const r of rows){
-      const tr=document.createElement('tr');
-      const dtStr=toLocalDateTime(r.ts);
-      const deltaStr=(r.delta>0?'+':'')+(r.delta??0);
-      const reason=r.reason??r.purpose??'';
-      const adjustedFor=r.takenBy??r.adjustedBy??r.forWhom??'';
-      tr.innerHTML=`
+
+    const itemFilter = document.getElementById('hist-item-filter').value;
+    if (itemFilter) rows = rows.filter(r => r.item === itemFilter);
+
+    document.getElementById('hist-count').textContent = `${rows.length} record${rows.length===1?'':'s'}`;
+
+    for (const r of rows) {
+      const tr = document.createElement('tr');
+      const dtStr = toLocalDateTime(r.ts);
+      const deltaStr = (r.delta > 0 ? '+' : '') + (r.delta ?? 0);
+
+      // show reason (delete uses 'reason', adjust uses 'purpose')
+      const reason = r.reason ?? r.purpose ?? '';
+      // show whoever actually took it: takenBy OR adjustedBy OR forWhom
+      const adjustedFor = r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '';
+
+      tr.innerHTML = `
         <td class="nowrap">${dtStr}</td>
         <td>${escapeHtml(r.item)}</td>
-        <td>${escapeHtml(r.location??'')}</td>
+        <td>${escapeHtml(r.location ?? '')}</td>
         <td class="nowrap">${deltaStr}</td>
-        <td>${r.qtyAfter??''}</td>
-        <td>${escapeHtml(r.actor??'')}</td>
+        <td>${r.qtyAfter ?? ''}</td>
+        <td>${escapeHtml(r.actor ?? '')}</td>
         <td>${escapeHtml(reason)}</td>
         <td>${escapeHtml(adjustedFor)}</td>`;
       tbody.appendChild(tr);
     }
   }
 
+  /* Export + Clear */
   async function exportHistoryCSV(){
-    const qAdj=query(colAdjustments,orderBy("ts","desc"));
-    const snap=await getDocs(qAdj);
-    const rows=snap.docs.map(d=>({id:d.id,...d.data()}));
-    const header=['Date/Time','Item','Location','Change','Qty After (Total)','By (Name)','Reason','Adjusted by (name)'];
-    const csvRows=[header.join(',')];
-    for(const r of rows){
-      const reason=r.reason??r.purpose??'';
-      const adjustedFor=r.takenBy??r.adjustedBy??r.forWhom??'';
+    const qAdj = query(colAdjustments, orderBy("ts","desc"));
+    const snap = await getDocs(qAdj);
+    const rows = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+    const header = ['Date/Time','Item','Location','Change','Qty After (Total)','By (Name)','Reason','Adjusted by (name)'];
+    const csvRows = [header.join(',')];
+    for (const r of rows){
+      const reason = r.reason ?? r.purpose ?? '';
+      const adjustedFor = r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '';
       csvRows.push([
         toLocalDateTime(r.ts),
         csvEscape(r.item),
-        csvEscape(r.location??''),
-        (r.delta>0?'+':'')+(r.delta??0),
-        r.qtyAfter??'',
-        csvEscape(r.actor??''),
+        csvEscape(r.location ?? ''),
+        (r.delta>0?'+':'') + (r.delta ?? 0),
+        r.qtyAfter ?? '',
+        csvEscape(r.actor ?? ''),
         csvEscape(reason),
         csvEscape(adjustedFor)
       ].join(','));
     }
-    const BOM="\uFEFF";
-    const blob=new Blob([BOM+csvRows.join('\n')],{type:'text/csv;charset=utf-8;'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a');a.href=url;a.download=`inventory-history-${new Date().toISOString().slice(0,10)}.csv`;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);notify('CSV exported');
+    const BOM = "\uFEFF";
+    const blob = new Blob([BOM + csvRows.join('\n')], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = `inventory-history-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url); notify('CSV exported');
   }
-  window.exportHistoryCSV=exportHistoryCSV;
+  window.exportHistoryCSV = exportHistoryCSV;
 
   async function clearHistory(){
-    if(!confirm('This will permanently delete ALL history records. Continue?'))return;
+    if (!confirm('This will permanently delete ALL history records. Continue?')) return;
     try{
-      let snap=await getDocs(query(colAdjustments));
-      while(!snap.empty){
-        const batch=writeBatch(db);let count=0;
-        snap.forEach(docSnap=>{if(count<450){batch.delete(docSnap.ref);count++;}});
+      let snap = await getDocs(query(colAdjustments));
+      while (!snap.empty){
+        const batch = writeBatch(db); let count = 0;
+        snap.forEach(docSnap => { if (count<450){ batch.delete(docSnap.ref); count++; } });
         await batch.commit();
-        snap=await getDocs(query(colAdjustments));
+        snap = await getDocs(query(colAdjustments));
       }
       notify('History cleared');
-    }catch(err){console.error(err);notify('Failed to clear history','error');}
+    } catch(err){ console.error(err); notify('Failed to clear history','error'); }
   }
-  window.clearHistory=clearHistory;
+  window.clearHistory = clearHistory;
 </script>
 </body>
 </html>
