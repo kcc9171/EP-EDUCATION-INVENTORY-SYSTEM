@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sign in</title>
+  <!-- Favicon using your logo -->
+  <link rel="icon" href="https://media.licdn.com/dms/image/v2/C560BAQH1e7RqZpFCqA/company-logo_200_200/company-logo_200_200/0/1630649511750?e=2147483647&v=beta&t=Xt8U3KJxbI4FiV1rmcsehbP6Y2XdByD6pEP8X7K378g">
+  <style>
+    /* ==== Light theme based on #F7F4EA ==== */
+    :root{
+      --bg:#F7F4EA;        /* page background */
+      --panel:#EEE6D8;     /* card / inputs */
+      --ink:#1F2937;       /* primary text */
+      --muted:#6B7280;     /* muted text */
+      --line:#D9CFC1;      /* borders */
+      --accent:#0EA5A4;    /* teal accent */
+      --shadow:0 6px 20px rgba(0,0,0,.08);
+    }
+
+    * { box-sizing:border-box }
+    body {
+      margin:0; min-height:100vh; display:grid; place-items:center;
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:var(--bg); color:var(--ink);
+      padding:16px;
+    }
+
+    .card {
+      width:min(420px,92vw);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:24px;
+      box-shadow:var(--shadow);
+      background:var(--panel);
+    }
+
+    /* Logo block */
+    .brand { display:flex; flex-direction:column; align-items:center; gap:10px; margin-bottom:6px; }
+    .logo {
+      width:72px; height:72px; border-radius:14px; object-fit:cover; background:#fff;
+      border:1px solid var(--line); box-shadow:var(--shadow);
+    }
+
+    h1 { margin:0 0 6px; text-align:center; color:var(--ink) }
+    .muted { color:var(--muted); font-size:14px; margin:0 0 16px; text-align:center }
+
+    label { font-size:14px; display:block; margin:.5rem 0 .25rem; color:var(--ink) }
+
+    input {
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      font-size:16px;
+      background:#fff;               /* keep inputs white for max contrast */
+      color:var(--ink);
+      caret-color:var(--ink);
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    input::placeholder { color:var(--muted); opacity:1 }
+    input:focus {
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(14,165,164,.18);
+    }
+
+    button {
+      margin-top:14px;
+      width:100%;
+      padding:10px 12px;
+      border:1px solid var(--accent);
+      border-radius:8px;
+      background:var(--accent);
+      color:#fff;
+      font-size:16px;
+      cursor:pointer;
+      transition: filter .15s ease, transform .02s ease;
+    }
+    button:hover { filter:brightness(.95) }
+    button:active { transform:translateY(1px) }
+
+    .err { color:#b91c1c; font-size:14px; min-height:18px; margin-top:8px; text-align:center }
+
+    /* Small helper: reduce motion users */
+    @media (prefers-reduced-motion: reduce) {
+      * { transition:none !important }
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="region" aria-labelledby="title">
+    <div class="brand">
+      <img
+        class="logo"
+        alt="Company logo"
+        src="https://media.licdn.com/dms/image/v2/C560BAQH1e7RqZpFCqA/company-logo_200_200/company-logo_200_200/0/1630649511750?e=2147483647&v=beta&t=Xt8U3KJxbI4FiV1rmcsehbP6Y2XdByD6pEP8X7K378g"
+      />
+    </div>
+
+    <h1 id="title">Inventory Login</h1>
+    <p class="muted">Please enter your username and password.</p>
+
+    <form id="login-form" novalidate>
+      <label for="username">Username</label>
+      <input id="username" type="text" required placeholder="Enter username" autocomplete="username" />
+
+      <label for="pw">Password</label>
+      <input id="pw" type="password" required placeholder="Enter password" autocomplete="current-password" />
+
+      <button type="submit">Sign in</button>
+      <div id="err" class="err" role="alert" aria-live="polite"></div>
+    </form>
+  </div>
+
+  <script>
+    // username -> { hash: <SHA-256 hex of password>, role: 'editor' | 'viewer' }
+    const ACCOUNTS = {
+      // EPEDU : EPEDU2025SECURELOGIN
+      "EPEDU":     { hash: "dcb29d675b72d042c839362546f63501afd9130965b0193b1718c2e6bd99ca80", role: "editor" },
+      // gwenntan : EPasia!234
+      "gwenntan":  { hash: "9440524470c0fd7f13b67eeb3a56354a46158c04f82b660f50fa96da3b481b48", role: "editor" },
+      // EPSUPPORT : EPSUPPORTISTHEBEST2025  -> viewer
+      "EPSUPPORT": { hash: "844bfaecdd264b1422e6ccb9bd789757fe34c358d76edf2d0790e0b0997882e3", role: "viewer" },
+      // NEW — Sally Kan : Epasia0507  -> editor (change to "viewer" if you prefer)
+      "Sally Kan": { hash: "d3dc9ee2aecc08b4b60b1258449a96c5b0ee80bb61964915f2918a4b36dbe39b", role: "editor" }
+    };
+
+    async function sha256Hex(text) {
+      const enc = new TextEncoder().encode(text);
+      const hash = await crypto.subtle.digest('SHA-256', enc);
+      return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    const form = document.getElementById('login-form');
+    const err  = document.getElementById('err');
+    const userInput = document.getElementById('username');
+    const pwInput   = document.getElementById('pw');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      err.textContent = '';
+
+      const username = userInput.value.trim();
+      const pw       = pwInput.value;
+
+      if (!username || !pw) {
+        err.textContent = 'Please fill in both fields.';
+        return;
+      }
+
+      const acct = ACCOUNTS[username];
+      if (!acct) { err.textContent = 'Invalid username.'; return; }
+
+      const givenHash = await sha256Hex(pw);
+      if (givenHash !== acct.hash) { err.textContent = 'Invalid password.'; return; }
+
+      // success — store auth + role and route appropriately
+      localStorage.setItem('auth_v1','ok');
+      localStorage.setItem('auth_user', username);
+      localStorage.setItem('auth_role', acct.role);
+      localStorage.setItem('auth_time', String(Date.now()));
+
+      location.href = (acct.role === 'viewer') ? 'viewer.html' : 'index.html';
+    });
+
+    // Already authenticated? send to the correct page.
+    const ok   = localStorage.getItem('auth_v1') === 'ok';
+    const role = localStorage.getItem('auth_role');
+    if (ok && role) {
+      location.replace(role === 'viewer' ? 'viewer.html' : 'index.html');
+    }
+  </script>
+</body>
+</html>
