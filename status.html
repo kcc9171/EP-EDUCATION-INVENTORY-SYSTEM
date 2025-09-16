@@ -19,137 +19,88 @@
 </script>
 
 <style>
-  /* ==== Light theme based on #F7F4EA (theme-only changes) ==== */
+  /* ==== Light theme based on #F7F4EA ==== */
   :root{
     --nav-w:260px;
-
-    /* Core palette */
-    --bg:#F7F4EA;          /* page background */
-    --s-card:#EEE6D8;      /* cards / panels */
-    --s-ink:#1F2937;       /* primary text */
-    --s-muted:#6B7280;     /* muted text */
-    --s-line:#D9CFC1;      /* lines & borders */
-    --s-badge:#EDE7DA;     /* subtle chip/badge bg */
-    --accent:#0EA5A4;      /* teal accent for primary actions */
+    --bg:#F7F4EA;
+    --s-card:#EEE6D8;
+    --s-ink:#1F2937;
+    --s-muted:#6B7280;
+    --s-line:#D9CFC1;
+    --s-badge:#EDE7DA;
+    --accent:#0EA5A4;
   }
 
-  html,body{height:100%}
   body{margin:0;font-family:Arial,sans-serif;background:var(--bg);color:var(--s-ink)}
   h2{color:var(--s-ink)}
   .content{padding:20px;padding-top:80px;min-height:100vh;box-sizing:border-box}
 
-  /* Controls — themed */
   input,button,select,textarea{
     padding:8px;margin:4px;font-family:inherit;
-    color:var(--s-ink);
-    background:var(--s-card);
-    border:1px solid var(--s-line);
-    caret-color:var(--s-ink);
+    color:var(--s-ink);background:var(--s-card);
+    border:1px solid var(--s-line);caret-color:var(--s-ink);
   }
-  input::placeholder, textarea::placeholder{ color:var(--s-muted); opacity:1 }
+  input::placeholder,textarea::placeholder{color:var(--s-muted)}
 
-  /* Default button = subtle; use .action-btn for primary actions */
-  button{
-    border-radius:8px; cursor:pointer; transition:.15s ease;
-  }
-  button:hover{ background:var(--accent); color:#fff; border-color:var(--accent) }
-  .action-btn{ background:var(--accent); color:#fff; border:1px solid var(--accent); }
-  .action-btn:hover{ filter:brightness(.95) }
+  button{border-radius:8px;cursor:pointer;transition:.15s}
+  button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .action-btn{background:var(--accent);color:#fff;border:1px solid var(--accent)}
+  .action-btn:hover{filter:brightness(.95)}
 
-  /* hamburger + sidebar */
   #menu-check{display:none}
-  .hamburger{
-    position:fixed;left:12px;top:12px;width:32px;display:flex;flex-direction:column;gap:7px;
-    cursor:pointer;user-select:none;z-index:1200;transition:transform .3s
-  }
-  .hamburger .bar{
-    height:3px;background:var(--s-ink);border-radius:10px;transition:transform .35s,opacity .25s,width .35s
-  }
+  .hamburger{position:fixed;left:12px;top:12px;width:32px;display:flex;flex-direction:column;gap:7px;
+    cursor:pointer;z-index:1200;transition:.3s}
+  .hamburger .bar{height:3px;background:var(--s-ink);border-radius:10px;transition:.35s}
   .hamburger .bar1,.hamburger .bar3{width:18px}.hamburger .bar2{width:28px}
   #menu-check:checked+label.hamburger{transform:translateX(var(--nav-w))}
   #menu-check:checked+label.hamburger .bar1{transform:translateY(10px) rotate(45deg);width:28px}
   #menu-check:checked+label.hamburger .bar2{opacity:0}
   #menu-check:checked+label.hamburger .bar3{transform:translateY(-10px) rotate(-45deg);width:28px}
 
-  .sidebar{
-    position:fixed;inset:0 auto 0 0;width:var(--nav-w);
-    background:var(--s-card);padding:20px;box-sizing:border-box;
-    transform:translateX(-100%);transition:.3s;z-index:1100;overflow:auto;
-    border-right:1px solid var(--s-line);
-    box-shadow:0 10px 30px rgba(0,0,0,.08)
-  }
-  .sidebar a,.sidebar button{
-    display:block;width:100%;margin-bottom:10px;padding:10px;text-align:left;
-    border-radius:8px;text-decoration:none;color:inherit;border:1px solid var(--s-line);background:transparent
-  }
+  .sidebar{position:fixed;inset:0 auto 0 0;width:var(--nav-w);background:var(--s-card);
+    padding:20px;box-sizing:border-box;transform:translateX(-100%);transition:.3s;z-index:1100;
+    border-right:1px solid var(--s-line);box-shadow:0 10px 30px rgba(0,0,0,.08)}
+  .sidebar a,.sidebar button{display:block;width:100%;margin-bottom:10px;padding:10px;
+    text-align:left;border-radius:8px;text-decoration:none;color:inherit;
+    border:1px solid var(--s-line);background:transparent}
   .sidebar a:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
   #menu-check:checked~.sidebar{transform:translateX(0)}
   label.overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;visibility:hidden;transition:.3s;z-index:1090}
   #menu-check:checked~label.overlay{opacity:1;visibility:visible}
 
-  .status-toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0 16px}
-
-  /* Fancy input (search) themed */
-  .input-container{position:relative;margin:8px 4px;min-width:280px;flex:1}
-  .input{
-    width:100%;padding:10px;height:40px;
-    border:2px solid var(--s-line);
-    border-top:none;border-bottom:none;
-    font-size:16px;background:transparent;outline:none;
-    box-shadow:7px 7px 0 0 var(--s-line);
-    transition:.5s;box-sizing:border-box;
-    color:var(--s-ink);caret-color:var(--s-ink);
-  }
-  .topline,.underline{position:absolute;background-color:var(--s-line);height:2px;right:0;transition:.5s}
-  .topline{width:0;top:0}.underline{width:0;bottom:0}
-  .input:focus~.topline{width:35%}.input:focus~.underline{width:100%}
-  .label{
-    position:absolute;top:10px;left:10px;color:var(--s-ink);
-    transition:.5s;transform:scale(0);z-index:-1;background:var(--bg);padding:0 4px
-  }
-  .input:focus~.label{top:-10px;transform:scale(1)}
+  .status-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 16px}
+  .input-container{position:relative;flex:1}
+  .input{width:100%;padding:10px;height:40px;border:2px solid var(--s-line);
+    border-top:none;border-bottom:none;font-size:16px;background:transparent;
+    box-shadow:7px 7px 0 0 var(--s-line);color:var(--s-ink)}
+  .label{position:absolute;top:10px;left:10px;color:var(--s-ink);background:var(--bg);padding:0 4px;transition:.3s}
+  .input:focus~.label{top:-10px;transform:scale(.9)}
 
   .status-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
-  .status-card{
-    background:var(--s-card);border:1px solid var(--s-line);border-radius:16px;
-    box-shadow:0 8px 24px rgba(15,23,42,.06);color:var(--s-ink);
-    display:flex;flex-direction:column;gap:10px;padding:14px 14px 12px
-  }
-  .status-card__top{display:flex;align-items:center;justify-content:space-between;color:var(--s-muted);font-size:12px;gap:8px}
-  .status-card__title{font-weight:700;margin:2px 0 4px}
+  .status-card{background:var(--s-card);border:1px solid var(--s-line);border-radius:16px;
+    box-shadow:0 8px 24px rgba(15,23,42,.06);padding:14px}
+  .status-card__top{display:flex;justify-content:space-between;font-size:12px;color:var(--s-muted)}
+  .status-card__title{font-weight:700}
   .status-meta{font-size:12px;color:var(--s-muted);display:grid;grid-template-columns:auto auto;gap:4px 14px}
-  .status-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;border-top:1px dashed var(--s-line);padding-top:8px}
-  .status-chip{background:var(--s-badge);border-radius:999px;padding:2px 8px;font-size:12px}
+  .status-chip{border-radius:999px;padding:2px 8px;font-size:12px}
   .chip--loan{background:#dcfce7;color:#065f46}
   .chip--rent{background:#fef3c7;color:#92400e}
   .chip--where{background:#e0e7ff;color:#3730a3}
-  .status-del{background:transparent;border:1px solid var(--s-line);border-radius:8px;padding:4px 8px;font-size:12px;cursor:pointer;color:#374151}
-  .status-del:hover{background:#f9fafb}
-  .status-edit{background:transparent;border:1px solid var(--s-line);border-radius:8px;padding:4px 8px;font-size:12px;cursor:pointer;color:#374151}
-  .status-edit:hover{background:#f9fafb}
-  .status-amt{font-weight:800}
+  .status-del,.status-edit{border:1px solid var(--s-line);border-radius:8px;padding:2px 6px;font-size:12px;cursor:pointer}
 
-  /* Modal + toasts */
   .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.25);z-index:9999}
   .modal.open{display:flex}
-  .modal-card{width:95%;max-width:520px;background:var(--s-card);border-radius:8px;padding:16px 18px;box-shadow:0 20px 40px rgba(0,0,0,.12);border:1px solid var(--s-line);color:var(--s-ink)}
-  .modal-card h3{margin:0 0 10px;color:var(--s-ink)}
-  .modal-card label{display:block;margin:10px 0 4px;font-size:14px;color:var(--s-ink)}
-  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
-
+  .modal-card{width:95%;max-width:520px;background:var(--s-card);border-radius:8px;padding:16px;border:1px solid var(--s-line)}
   .toast-wrap{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:10000}
-  .toast{background:#E9E2D6;color:var(--s-ink);padding:10px 12px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.12)}
-  .toast--warn{background:#F2C97D;color:#4A2E00}.toast--error{background:#F3B8B8;color:#711313}.toast__close{margin-left:12px;cursor:pointer;font-weight:700}
+  .toast{background:#E9E2D6;color:var(--s-ink);padding:10px 12px;border-radius:8px}
 </style>
 </head>
 <body>
 
 <input id="menu-check" type="checkbox" />
-<label for="menu-check" class="hamburger" aria-label="Toggle menu" aria-controls="side" role="button" tabindex="0">
-  <span class="bar bar1"></span><span class="bar bar2"></span><span class="bar bar3"></span>
-</label>
+<label for="menu-check" class="hamburger"><span class="bar bar1"></span><span class="bar bar2"></span><span class="bar bar3"></span></label>
 
-<nav class="sidebar" id="side" role="navigation" aria-label="Main">
+<nav class="sidebar">
   <a href="index.html">Add New Stock</a>
   <a href="adjust.html">Adjust Stock</a>
   <a href="location.html">Location</a>
@@ -159,62 +110,41 @@
   <hr>
   <button onclick="logout()">Logout</button>
 </nav>
-<label class="overlay" for="menu-check" aria-hidden="true"></label>
+<label class="overlay" for="menu-check"></label>
 
 <div class="toast-wrap" id="toast-wrap"></div>
 
 <main class="content">
-  <section aria-labelledby="statusPageTitle">
-    <h2 id="statusPageTitle">Status</h2>
-
-    <div class="status-toolbar">
-      <div class="input-container">
-        <input id="status-search" type="text" class="input" placeholder=" ">
-        <span class="topline"></span><span class="underline"></span>
-        <label for="status-search" class="label">Search order / item / remarks…</label>
-      </div>
-      <button class="action-btn" id="status-add-btn">+ New Status</button>
+  <h2>Status</h2>
+  <div class="status-toolbar">
+    <div class="input-container">
+      <input id="status-search" type="text" class="input" placeholder=" ">
+      <label for="status-search" class="label">Search order / item / remarks…</label>
     </div>
-
-    <div id="statusList" class="status-list"></div>
-    <div style="color:var(--s-muted)">Track individual loan/rent sets here. Use the + button to add a record.</div>
-  </section>
+    <button class="action-btn" id="status-add-btn">+ New Status</button>
+  </div>
+  <div id="statusList" class="status-list"></div>
 </main>
 
-<!-- Status modal (used for Add + Edit) -->
-<div id="statusModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="status-title">
+<!-- Modal -->
+<div id="statusModal" class="modal">
   <div class="modal-card">
     <h3 id="status-title">Add Status</h3>
-    <label for="st-order">Order ID</label>
-    <input id="st-order" type="text" placeholder="e.g., ORDER 543" class="input">
-    <label for="st-item">Item Name</label>
-    <input id="st-item" type="text" placeholder="e.g., 3D WRITING PEN" class="input">
-    <label for="st-qty">Quantity</label>
-    <input id="st-qty" type="number" min="1" step="1" value="1" placeholder="Quantity" class="input">
-    <label for="st-type">Status</label>
-    <select id="st-type" class="input"><option>Loan</option><option>Rent</option></select>
-    <label for="st-where">Location</label>
-    <select id="st-where" class="input">
-      <option>Client</option>
-      <option>On the way back</option>
-      <option>Office</option>
-    </select>
-    <label for="st-remarks">Remarks</label>
-    <textarea id="st-remarks" rows="3" placeholder="Optional notes…" class="input" style="height:auto"></textarea>
-    <div class="modal-actions">
-      <button id="st-cancel" style="background:#2b2b2b;border-color:#2b2b2b;color:#fff">Cancel</button>
-      <button id="st-save" class="action-btn">Save</button>
-    </div>
+    <label>Order ID <input id="st-order" type="text" class="input"></label>
+    <label>Item Name <input id="st-item" type="text" class="input"></label>
+    <label>Quantity <input id="st-qty" type="number" min="1" value="1" class="input"></label>
+    <label>Status <select id="st-type" class="input"><option>Loan</option><option>Rent</option></select></label>
+    <label>Location <select id="st-where" class="input"><option>Client</option><option>On the way back</option><option>Office</option></select></label>
+    <label>Remarks <textarea id="st-remarks" rows="3" class="input"></textarea></label>
+    <div class="modal-actions"><button id="st-cancel">Cancel</button><button id="st-save" class="action-btn">Save</button></div>
   </div>
 </div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
   import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  /* ---------- Firebase ---------- */
   const firebaseConfig = {
     apiKey: "AIzaSyAL_C_bGiD-G_2g1jro7-OzxIlM0akRdTY",
     authDomain: "epedu-inventory-database.firebaseapp.com",
@@ -225,169 +155,57 @@
     measurementId: "G-GFEEP49VRP"
   };
   const app = initializeApp(firebaseConfig);
-  try { getAnalytics(app); } catch(e) {}
   const auth = getAuth(app);
   const db   = getFirestore(app);
   signInAnonymously(auth).catch(console.error);
 
   const CURRENT_USER = localStorage.getItem('auth_user') || 'Unknown';
 
-  /* ---------- Sidebar ARIA ---------- */
-  const menuCheck = document.getElementById('menu-check');
-  const hamb = document.querySelector('label.hamburger');
-  function syncAria(){ hamb.setAttribute('aria-expanded', String(menuCheck.checked)); }
-  menuCheck.addEventListener('change', syncAria); syncAria();
+  const toastWrap=document.getElementById('toast-wrap');
+  function notify(msg){const el=document.createElement('div');el.className='toast';el.textContent=msg;toastWrap.appendChild(el);setTimeout(()=>el.remove(),3000);}
 
-  /* ---------- Toasts ---------- */
-  const toastWrap = document.getElementById('toast-wrap');
-  function escapeHtml(s){ return (s ?? '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-  function notify(msg, type='info', timeout=3200){
-    const el = document.createElement('div');
-    el.className = 'toast' + (type==='warn' ? ' toast--warn' : type==='error' ? ' toast--error' : '');
-    el.innerHTML = `${escapeHtml(msg)} <span class="toast__close" aria-label="Dismiss" role="button">×</span>`;
-    toastWrap.appendChild(el);
-    const close = ()=>{ if (el && el.parentNode) el.parentNode.removeChild(el); };
-    el.querySelector('.toast__close').addEventListener('click', close);
-    if (timeout>0) setTimeout(close, timeout);
-  }
+  const colStatuses=collection(db,"statuses");
+  let statuses=[];
+  onSnapshot(query(colStatuses,orderBy("ts","desc")),(snap)=>{statuses=snap.docs.map(d=>({id:d.id,...d.data()}));renderStatuses();});
 
-  /* ---------- Firestore ---------- */
-  const colStatuses = collection(db, "statuses");
+  const modal=document.getElementById('statusModal');const stSave=document.getElementById('st-save');const stCancel=document.getElementById('st-cancel');
+  let editingId=null;
 
-  /* ---------- State & live updates ---------- */
-  let statuses = [];
-  onSnapshot(query(colStatuses, orderBy("ts","desc")), (snap) => {
-    statuses = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-    renderStatuses();
-  });
+  document.getElementById('status-add-btn').onclick=()=>{editingId=null;modal.classList.add('open');};
+  stCancel.onclick=()=>modal.classList.remove('open');
 
-  /* ---------- UI wiring ---------- */
-  const statusModal = document.getElementById('statusModal');
-  const stOpenBtn   = document.getElementById('status-add-btn');
-  const stCancel    = document.getElementById('st-cancel');
-  const stSave      = document.getElementById('st-save');
-  const stSearch    = document.getElementById('status-search');
-
-  let editingId = null; // when set, Save will update instead of create
-
-  function openStatusModalNew(){
-    editingId = null;
-    document.getElementById('status-title').textContent = 'Add Status';
-    document.getElementById('st-order').value   = '';
-    document.getElementById('st-item').value    = '';
-    document.getElementById('st-qty').value     = '1';
-    document.getElementById('st-type').value    = 'Loan';
-    document.getElementById('st-where').value   = 'Client';
-    document.getElementById('st-remarks').value = '';
-    statusModal.classList.add('open');
-    setTimeout(()=>document.getElementById('st-order').focus(),0);
-  }
-
-  function openStatusModalEdit(row){
-    editingId = row.id;
-    document.getElementById('status-title').textContent = 'Edit Status';
-    document.getElementById('st-order').value   = row.order || '';
-    document.getElementById('st-item').value    = row.item  || '';
-    document.getElementById('st-qty').value     = row.qty   ?? 1;
-    document.getElementById('st-type').value    = row.status || 'Loan';
-    document.getElementById('st-where').value   = row.where  || 'Client';
-    document.getElementById('st-remarks').value = row.remarks || '';
-    statusModal.classList.add('open');
-    setTimeout(()=>document.getElementById('st-order').focus(),0);
-  }
-
-  function closeStatusModal(){ statusModal.classList.remove('open'); }
-
-  stOpenBtn.addEventListener('click', openStatusModalNew);
-  stCancel.addEventListener('click', closeStatusModal);
-  statusModal.addEventListener('click', e => { if (e.target.id === 'statusModal') closeStatusModal(); });
-  statusModal.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); stSave.click(); } });
-
-  stSave.addEventListener('click', async ()=>{
-    const order   = document.getElementById('st-order').value.trim();
-    const item    = document.getElementById('st-item').value.trim();
-    const qty     = parseInt(document.getElementById('st-qty').value,10);
-    const stype   = document.getElementById('st-type').value; // Loan | Rent
-    const where   = document.getElementById('st-where').value; // Client | On the way back | Office
-    const remarks = document.getElementById('st-remarks').value.trim();
-    if (!order || !item || !Number.isInteger(qty) || qty<=0){
-      notify('Please fill Order ID, Item Name, and a positive Quantity.','warn'); return;
-    }
+  stSave.onclick=async()=>{
+    const order=document.getElementById('st-order').value.trim();
+    const item=document.getElementById('st-item').value.trim();
+    const qty=parseInt(document.getElementById('st-qty').value,10);
+    const status=document.getElementById('st-type').value;
+    const where=document.getElementById('st-where').value;
+    const remarks=document.getElementById('st-remarks').value.trim();
+    if(!order||!item||!qty){notify("Fill all fields");return;}
     try{
-      if (editingId){
-        await updateDoc(doc(db,'statuses',editingId), {
-          order, item, qty, status:stype, where, remarks,
-          editor: CURRENT_USER, updatedAt: serverTimestamp()
-        });
-        notify('Status updated');
-      } else {
-        await addDoc(colStatuses, {
-          ts:serverTimestamp(), order, item, qty, status:stype, where, remarks, actor:CURRENT_USER
-        });
-        notify('Status saved');
-      }
-      closeStatusModal();
-    }catch(err){ console.error(err); notify('Failed to save status','error'); }
-  });
+      if(editingId){await updateDoc(doc(db,"statuses",editingId),{order,item,qty,status,where,remarks,editor:CURRENT_USER,updatedAt:serverTimestamp()});notify("Updated");}
+      else{await addDoc(colStatuses,{ts:serverTimestamp(),order,item,qty,status,where,remarks,actor:CURRENT_USER});notify("Added");}
+      modal.classList.remove('open');
+    }catch(e){console.error(e);notify("Error");}
+  };
 
-  /* ---------- Render ---------- */
   function renderStatuses(){
-    const wrap = document.getElementById('statusList'); if (!wrap) return;
-    wrap.innerHTML = '';
-    let rows = statuses.slice();
-    const q = (stSearch?.value || '').trim().toLowerCase();
-    if (q) rows = rows.filter(r =>
-      (r.order||'').toLowerCase().includes(q) ||
-      (r.item||'').toLowerCase().includes(q) ||
-      (r.remarks||'').toLowerCase().includes(q) ||
-      (r.where||'').toLowerCase().includes(q)
-    );
-    for (const r of rows){
-      const div = document.createElement('div'); div.className='status-card';
-      const dt = r.ts?.toDate ? r.ts.toDate().toLocaleString() : (r.ts ? new Date(r.ts).toLocaleString() : '');
-      const chipClass = (r.status||'').toLowerCase()==='rent' ? 'chip--rent' : 'chip--loan';
-      const whereTxt = r.where || 'Client';
-      div.innerHTML = `
-        <div class="status-card__top">
-          <span>${escapeHtml(dt || '')}</span>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <span class="status-chip ${chipClass}">${escapeHtml(r.status || '')}</span>
-            <span class="status-chip chip--where" title="Location">${escapeHtml(whereTxt)}</span>
-            <button class="status-edit" data-status-edit="${r.id}" title="Edit">✏️</button>
-            <button class="status-del" data-status-del="${r.id}" title="Delete">🗑</button>
-          </div>
-        </div>
-        <div class="status-card__title">Order: ${escapeHtml(r.order || '')}</div>
-        <div class="status-meta">
-          <div>Item Name</div><div>${escapeHtml(r.item || '')}</div>
-          <div>Quantity</div><div class="status-amt">${r.qty ?? ''}</div>
-          <div>Location</div><div>${escapeHtml(whereTxt)}</div>
-        </div>
-        ${r.remarks ? `<div class="status-row"><div style="color:var(--s-muted);">Remarks</div><div>${escapeHtml(r.remarks)}</div></div>` : ''}`;
-      wrap.appendChild(div);
-    }
-    // wire edit + delete
-    wrap.querySelectorAll('[data-status-edit]').forEach(btn=>{
-      btn.onclick = (e)=>{
-        const id = e.currentTarget.getAttribute('data-status-edit');
-        const row = statuses.find(s=>s.id===id);
-        if (row) openStatusModalEdit(row);
-      };
-    });
-    wrap.querySelectorAll('[data-status-del]').forEach(btn=>{
-      btn.onclick = async (e)=>{
-        const id = e.currentTarget.getAttribute('data-status-del');
-        if (!id) return;
-        if (!confirm('Delete this status record?')) return;
-        try{ await deleteDoc(doc(db,'statuses',id)); notify('Status deleted'); }
-        catch(err){ console.error(err); notify('Failed to delete status','error'); }
-      };
+    const wrap=document.getElementById('statusList');wrap.innerHTML='';
+    let rows=statuses;const q=(document.getElementById('status-search').value||'').toLowerCase();
+    if(q)rows=rows.filter(r=>(r.order||'').toLowerCase().includes(q)||(r.item||'').toLowerCase().includes(q)||(r.remarks||'').toLowerCase().includes(q)||(r.where||'').toLowerCase().includes(q));
+    rows.forEach(r=>{
+      const d=document.createElement('div');d.className='status-card';
+      const dt=r.ts?.toDate?r.ts.toDate().toLocaleString():'';
+      const chip=r.status==='Rent'?'chip--rent':'chip--loan';
+      d.innerHTML=`<div class="status-card__top"><span>${dt}</span><div><span class="status-chip ${chip}">${r.status}</span><span class="status-chip chip--where">${r.where}</span><button class="status-edit">✏️</button><button class="status-del">🗑</button></div></div>
+      <div class="status-card__title">Order: ${r.order}</div><div class="status-meta"><div>Item</div><div>${r.item}</div><div>Qty</div><div>${r.qty}</div></div>${r.remarks?`<div>${r.remarks}</div>`:''}`;
+      d.querySelector('.status-edit').onclick=()=>{editingId=r.id;document.getElementById('st-order').value=r.order;document.getElementById('st-item').value=r.item;document.getElementById('st-qty').value=r.qty;document.getElementById('st-type').value=r.status;document.getElementById('st-where').value=r.where;document.getElementById('st-remarks').value=r.remarks;modal.classList.add('open');};
+      d.querySelector('.status-del').onclick=async()=>{if(confirm("Delete?"))await deleteDoc(doc(db,"statuses",r.id));};
+      wrap.appendChild(d);
     });
   }
-  stSearch?.addEventListener('input', renderStatuses);
-
-  /* ---------- ESC closes modal ---------- */
-  window.addEventListener('keydown', (e) => { if (e.key === 'Escape'){ statusModal.classList.remove('open'); }});
+  document.getElementById('status-search').oninput=renderStatuses;
+  window.addEventListener('keydown',e=>{if(e.key==="Escape")modal.classList.remove('open');});
 </script>
 </body>
 </html>
