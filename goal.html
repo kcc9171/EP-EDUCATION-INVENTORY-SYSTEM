@@ -156,17 +156,18 @@
 </main>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-analytics.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-  import { getFirestore, collection, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import { getFirestore, collection, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  /* --- Firebase config (ep-education-inventory-system) --- */
+  /* 🔁 UPDATED: new Firebase project config */
   const firebaseConfig = {
     apiKey: "AIzaSyDcRIe_9vFcAhQgbwlhritecpj1iXtsv-M",
     authDomain: "ep-education-inventory-system.firebaseapp.com",
+    databaseURL: "https://ep-education-inventory-system-default-rtdb.asia-southeast1.firebasedatabase.app",
     projectId: "ep-education-inventory-system",
-    storageBucket: "ep-education-inventory-system.appspot.com",
+    storageBucket: "ep-education-inventory-system.firebasestorage.app",
     messagingSenderId: "378090475953",
     appId: "1:378090475953:web:7c80e4eb3646d64825ed90",
     measurementId: "G-BS11QEKE7Q"
