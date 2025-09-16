@@ -1,3 +1,6 @@
+Here’s the page with the Firebase config swapped to your new project. Everything else is unchanged.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,9 +39,8 @@
     --chip:#EDE7DA;      /* subtle chip/pill bg */
 
     /* Helper card accents */
-    --helper-accent:#6D28D9;
-    --helper-panel:#F3ECDF;
-    --shadow:0 10px 24px rgba(0,0,0,.08);
+    --helper-accent:#6D28D9;  /* purple accent line (kept as a fun pop) */
+    --helper-panel:#F3ECDF;   /* light panel inside helper */
   }
 
   html,body{height:100%}
@@ -51,26 +53,22 @@
   h1,h2,h3{color:var(--ink)}
   .content{padding:20px;padding-top:80px;min-height:100vh;box-sizing:border-box}
 
-  /* Controls — simple + consistent heights */
-  .btn, .input, select{
-    height:42px;
-    padding:0 12px;
-    font-size:16px;
-    border:1px solid var(--line);
-    background:var(--panel);
+  /* Controls — legibility & theme consistency */
+  input,button,select,textarea{
+    padding:8px;margin:4px;font-family:inherit;
     color:var(--ink);
-    border-radius:10px;
+    background:var(--panel);
+    border:1px solid var(--line);
+    caret-color:var(--ink);
   }
-  input[type="number"]{ -moz-appearance:textfield; }
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button{ -webkit-appearance: none; margin:0; }
+  input::placeholder, textarea::placeholder{ color:var(--muted); opacity:1 }
 
-  .btn{
+  button{
+    border-radius:8px;
     cursor:pointer;
     transition:.15s ease;
-    white-space:nowrap
   }
-  .btn:hover{
+  button:hover{
     background:var(--accent);
     color:#ffffff;
     border-color:var(--accent);
@@ -85,16 +83,20 @@
     cursor:pointer;user-select:none;z-index:1200;transition:transform .3s
   }
   .hamburger .bar{
-    height:3px;background:var(--ink);border-radius:10px
+    height:3px;background:var(--ink);border-radius:10px;
+    transition:transform .35s,opacity .25s,width .35s
   }
+  .hamburger .bar1,.hamburger .bar3{width:18px}.hamburger .bar2{width:28px}
   #menu-check:checked+label.hamburger{transform:translateX(var(--nav-w))}
-  #menu-check:checked+label.hamburger .bar{}
+  #menu-check:checked+label.hamburger .bar1{transform:translateY(10px) rotate(45deg);width:28px}
+  #menu-check:checked+label.hamburger .bar2{opacity:0}
+  #menu-check:checked+label.hamburger .bar3{transform:translateY(-10px) rotate(-45deg);width:28px}
 
   .sidebar{
     position:fixed;inset:0 auto 0 0;width:var(--nav-w);
     background:var(--panel);padding:20px;box-sizing:border-box;
     transform:translateX(-100%);transition:.3s;z-index:1100;overflow:auto;
-    box-shadow:var(--shadow);border-right:1px solid var(--line)
+    box-shadow:0 10px 30px rgba(0,0,0,.08);border-right:1px solid var(--line)
   }
   .sidebar a,.sidebar button{
     display:block;width:100%;margin-bottom:10px;padding:10px;text-align:left;border-radius:8px;text-decoration:none;
@@ -105,59 +107,56 @@
   label.overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;visibility:hidden;transition:.3s;z-index:1090}
   #menu-check:checked~label.overlay{opacity:1;visibility:visible}
 
-  /* Add form: tidy, aligned, responsive */
-  .add-form{
-    display:grid;
-    grid-template-columns: minmax(240px, 1.2fr) 160px 240px auto;
-    gap:12px;
-    align-items:center;
-    max-width:980px;
+  /* Fancy input (uses theme vars) */
+  .input-container{position:relative;margin:8px 4px}
+  .input{
+    width:100%;padding:10px;height:40px;
+    border:2px solid var(--line);
+    border-top:none;border-bottom:none;
+    font-size:16px;background:transparent;outline:none;
+    box-shadow:7px 7px 0 0 var(--line);
+    transition:.5s;box-sizing:border-box;
+    color:var(--ink);caret-color:var(--ink);
   }
-  @media (max-width: 820px){
-    .add-form{ grid-template-columns: 1fr 1fr; }
-    .add-form .stack-span{ grid-column: 1 / -1; }
+  .label{
+    position:absolute;top:10px;left:10px;color:var(--ink);
+    transition:.5s;transform:scale(0);z-index:-1;background:var(--bg);padding:0 4px
   }
+  .topline,.underline{position:absolute;background-color:var(--line);height:2px;right:0;transition:.5s}
+  .topline{width:0}.underline{width:0;bottom:0}
+  .input-container input:focus~.topline{width:35%}
+  .input-container input:focus~.underline{width:100%}
+  .input-container input:focus~.label{top:-10px;transform:scale(1)}
+  .input-container select{appearance:none}
 
   /* Helper card (themed) */
-  .helper-row{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+  .helper-row{display:grid;grid-template-columns:1fr;gap:16px;margin-top:12px}
   .card.helper{
-    width:100%;border-radius:15px;background:var(--helper-panel);color:var(--ink);padding:24px 16px;
-    box-shadow:var(--shadow);border:1px solid var(--line);position:relative
+    width:100%;border-radius:15px;background:var(--helper-panel);color:var(--ink);padding:16px;
+    box-shadow:0 8px 22px rgba(0,0,0,.08);border:1px solid var(--line)
   }
-  .card-border-top{
-    width:65%;height:4px;background:var(--helper-accent);
-    margin:0 auto 14px;border-radius:0 0 14px 14px
-  }
+  .card-border-top{width:60%;height:3px;background:var(--helper-accent);margin:6px auto 10px;border-radius:0 0 15px 15px}
   .card.helper .img{
-    width:64px;height:64px;background:#fff;border-radius:14px;margin:8px auto 10px;
-    display:flex;align-items:center;justify-content:center;font-size:28px;border:1px solid var(--line)
+    width:70px;height:70px;background:var(--panel);border-radius:15px;margin:14px auto 6px;
+    display:flex;align-items:center;justify-content:center;font-size:24px;border:1px solid var(--line)
   }
   .card.helper span{display:block;text-align:center}
-  .card.helper .job{font-size:13px;color:var(--muted)}
-  .card.helper .btn{display:inline-flex;align-items:center;gap:8px}
-  .helper-actions{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:10px}
-  .helper-note{text-align:center;font-size:12px;color:var(--muted);margin-top:6px}
+  .card.helper .job{font-size:12px;color:var(--muted)}
+  .card.helper button{
+    padding:10px 16px;display:block;margin:12px auto 6px;border-radius:8px;border:1px solid var(--accent);
+    background:var(--accent);color:#fff;font-weight:600;cursor:pointer
+  }
+  .card.helper button:hover{filter:brightness(.95)}
+  .helper-note{text-align:center;font-size:12px;color:var(--muted);margin-top:4px}
 
   /* Toasts */
   .toast-wrap{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:10000}
   .toast{
-    background:#E9E2D6;color:var(--ink);padding:10px 12px;border-radius:10px;
+    background:#E9E2D6;color:var(--ink);padding:10px 12px;border-radius:8px;
     box-shadow:0 10px 30px rgba(0,0,0,.12);max-width:86vw
   }
   .toast--warn{background:#F2C97D;color:#4A2E00}.toast--error{background:#F3B8B8;color:#711313}
-
-  /* Tiny preview list of last added (helps verify the write) */
-  .preview{
-    margin-top:14px;
-    border:1px solid var(--line);
-    background:var(--panel);
-    border-radius:12px;
-    padding:10px;
-    max-width:980px;
-  }
-  .preview h3{margin:6px 0 10px;font-size:16px}
-  .pv-row{display:flex;justify-content:space-between;border-top:1px dashed var(--line);padding:6px 0}
-  .pv-row:first-child{border-top:none}
+  .toast__close{margin-left:12px;cursor:pointer;font-weight:700}
 </style>
 </head>
 <body>
@@ -165,7 +164,7 @@
 <!-- Toggle checkbox + hamburger -->
 <input id="menu-check" type="checkbox" />
 <label for="menu-check" class="hamburger" aria-label="Toggle menu" aria-controls="side" role="button" tabindex="0">
-  <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+  <span class="bar bar1"></span><span class="bar bar2"></span><span class="bar bar3"></span>
 </label>
 
 <!-- Off-canvas sidebar -->
@@ -189,109 +188,114 @@
 <main class="content">
   <section aria-labelledby="addPageTitle">
     <h2 id="addPageTitle">Add New Item</h2>
-
-    <!-- Clean, aligned row -->
-    <div class="add-form">
-      <input type="text" id="newItemName" class="input" placeholder="Item name" autocomplete="off" />
-      <input type="number" id="newItemQty" class="input" placeholder="Quantity" min="1" inputmode="numeric" />
-      <select id="newItemLoc" class="input">
-        <option>Old warehouse</option>
-        <option>New warehouse</option>
-        <option>Office</option>
-      </select>
-      <button class="btn" id="btnAddItem">Add Item</button>
+    <div class="add-row" style="display:grid;grid-template-columns:minmax(260px,1fr) 160px minmax(220px,1fr) auto;gap:12px;align-items:center;max-width:900px">
+      <div class="input-container">
+        <input type="text" id="newItemName" class="input" placeholder=" " autocomplete="off" />
+        <span class="topline"></span><span class="underline"></span>
+        <label for="newItemName" class="label">Item Name</label>
+      </div>
+      <input type="number" id="newItemQty" placeholder="Quantity" min="1" inputmode="numeric" aria-label="Quantity" />
+      <div class="input-container">
+        <select id="newItemLoc" class="input" style="height:40px">
+          <option>Old warehouse</option>
+          <option>New warehouse</option>
+          <option>Office</option>
+        </select>
+        <span class="topline"></span><span class="underline"></span>
+        <label for="newItemLoc" class="label">Location</label>
+      </div>
+      <button onclick="addNewItem()" aria-label="Add Item">Add Item</button>
     </div>
 
-    <!-- ImageKit helper -->
     <div class="helper-row">
       <div class="card helper" aria-label="Image Helper">
         <div class="card-border-top"></div>
         <div class="img">🖼️</div>
-        <span style="font-size:18px;font-weight:700;text-align:center">Need an image URL?</span>
-        <span class="job">Upload to ImageKit, copy the link, then set it via the 🖼 button on an item in Adjust.</span>
-        <div class="helper-actions">
-          <button type="button" class="btn" onclick="openImageKit()">Open ImageKit</button>
-          <button type="button" class="btn" onclick="alert('In Adjust page, click the 🖼 button on a card to paste the ImageKit URL.')">Where to paste?</button>
-        </div>
-        <div class="helper-note">Tip: choose the “Direct URL” in ImageKit for best results.</div>
+        <span>Need an image URL?</span>
+        <span class="job">Upload to ImageKit, copy the link, then set it via the 🖼 button on an item.</span>
+        <button type="button" onclick="openImgbb()">Open ImageKit</button>
+        <div class="helper-note">Tip: choose “Direct link” if available.</div>
       </div>
     </div>
 
-    <!-- Preview (shows the last few items so you know the write worked) -->
-    <div class="preview" id="previewBox" hidden>
-      <h3>Just added</h3>
-      <div id="pvList"></div>
-    </div>
-
-    <div class="muted">Signed in as <strong id="signedAs"></strong>. Data syncs via Firebase (Firestore).</div>
+    <div class="muted">Signed in as <strong id="signedAs"></strong>. Data syncs via Firebase (Firestore + Storage).</div>
   </section>
 </main>
 
 <!-- Firebase + App Logic -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
-  import { getFirestore, collection, doc, addDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import { getFirestore, collection, doc, addDoc, updateDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  // ✅ SAME project config as the rest of your site
+  /* 🔁 UPDATED: new Firebase project config */
   const firebaseConfig = {
-    apiKey: "AIzaSyAL_C_bGiD-G_2g1jro7-OzxIlM0akRdTY",
-    authDomain: "epedu-inventory-database.firebaseapp.com",
-    projectId: "epedu-inventory-database",
-    storageBucket: "epedu-inventory-database.appspot.com",
-    messagingSenderId: "124437251040",
-    appId: "1:124437251040:web:4989c73efc2f4afbf22185",
-    measurementId: "G-GFEEP49VRP"
+    apiKey: "AIzaSyDcRIe_9vFcAhQgbwlhritecpj1iXtsv-M",
+    authDomain: "ep-education-inventory-system.firebaseapp.com",
+    databaseURL: "https://ep-education-inventory-system-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ep-education-inventory-system",
+    storageBucket: "ep-education-inventory-system.firebasestorage.app",
+    messagingSenderId: "378090475953",
+    appId: "1:378090475953:web:7c80e4eb3646d64825ed90",
+    measurementId: "G-BS11QEKE7Q"
   };
 
   const app = initializeApp(firebaseConfig);
+  try { getAnalytics(app); } catch(e) {}
   const auth = getAuth(app);
+  const db   = getFirestore(app);
   signInAnonymously(auth).catch(console.error);
-  const db = getFirestore(app);
 
   const CURRENT_USER = localStorage.getItem('auth_user') || 'Unknown';
-  document.getElementById('signedAs').textContent = CURRENT_USER;
+  const signedAs = document.getElementById('signedAs'); if (signedAs) signedAs.textContent = CURRENT_USER;
 
   /* Toasts */
   const toastWrap = document.getElementById('toast-wrap');
-  function toast(msg, type='info', timeout=3400){
+  function toast(msg, type='info', timeout=3200){
     const el = document.createElement('div');
     el.className = 'toast' + (type==='warn' ? ' toast--warn' : type==='error' ? ' toast--error' : '');
-    el.textContent = msg;
+    el.innerHTML = `${escapeHtml(msg)} <span class="toast__close" aria-label="Dismiss" role="button">×</span>`;
     toastWrap.appendChild(el);
-    if (timeout>0) setTimeout(() => el.remove(), timeout);
+    const close = ()=>{ if (el && el.parentNode) el.parentNode.removeChild(el); };
+    el.querySelector('.toast__close').addEventListener('click', close);
+    if (timeout>0) setTimeout(close, timeout);
   }
   const notify = toast;
 
   /* Utils */
+  function escapeHtml(s){ return (s ?? '').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
   function normLoc(raw){
     const s=(raw||'').trim().toLowerCase();
     if (s.startsWith('old')) return 'Old warehouse';
     if (s.startsWith('new')) return 'New warehouse';
     if (s.startsWith('off')) return 'Office';
+    if (['old warehouse','new warehouse','office'].includes(s)) return s.replace(/\b\w/g,m=>m.toUpperCase());
     return null;
   }
 
-  /* Firestore refs + local state */
+  /* Sidebar ARIA */
+  const menuCheck = document.getElementById('menu-check');
+  const hamb = document.querySelector('label.hamburger');
+  function syncAria(){ hamb.setAttribute('aria-expanded', String(menuCheck.checked)); }
+  menuCheck.addEventListener('change', syncAria); syncAria();
+
+  /* Firestore refs */
   const colInventory = collection(db, "inventory");
-  let inventory = [];            // entire current inventory
-  let recentAdded = [];          // last few added (for preview box)
 
-  onSnapshot(colInventory, (snap) => {
-    inventory = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-  });
+  /* Keep a local copy of inventory so addNewItem can merge quantities if item exists */
+  let inventory = [];
+  onSnapshot(colInventory, (snap) => { inventory = snap.docs.map(d => ({ id:d.id, ...d.data() })); });
 
-  /* ImageKit launcher */
-  window.openImageKit = () =>
-    window.open('https://imagekit.io/dashboard/media-library/L0VQLUVEVUNBVElPTiBJTlZFTlJZIFNUT0NLUw', '_blank', 'noopener');
+  /* Open ImageKit instead of imgbb */
+  window.openImgbb = () => window.open('https://imagekit.io/dashboard/media-library/L0VQRURVIElOVkVOVE9SWSA', '_blank', 'noopener');
 
-  /* Add item */
+  /* Add item (now supports Office) */
   async function addNewItem() {
     const name = (document.getElementById('newItemName').value || '').trim().replace(/\s+/g,' ');
     const qty  = parseInt(document.getElementById('newItemQty').value,10);
     const location = normLoc(document.getElementById('newItemLoc').value);
-
-    if (!name || !Number.isInteger(qty) || qty <= 0) { notify("Enter a valid name and a quantity ≥ 1","warn"); return; }
+    if (!name || isNaN(qty) || qty <= 0) { notify("Enter a valid name and a quantity ≥ 1","warn"); return; }
     if (!location) { notify('Location must be "Old warehouse", "New warehouse", or "Office".',"warn"); return; }
 
     const existing = inventory.find(i => (i.name||'').toLowerCase() === name.toLowerCase());
@@ -300,60 +304,27 @@
         const incOld    = location === 'Old warehouse' ? qty : 0;
         const incNew    = location === 'New warehouse' ? qty : 0;
         const incOffice = location === 'Office'         ? qty : 0;
-
         const newOld    = Math.max(0, (existing.qtyOld ?? 0)    + incOld);
         const newNew    = Math.max(0, (existing.qtyNew ?? 0)    + incNew);
         const newOffice = Math.max(0, (existing.qtyOffice ?? 0) + incOffice);
-        const total     = newOld + newNew + newOffice;
-
-        // ✅ These are the exact fields Adjust uses (it listens on "inventory")
         await updateDoc(doc(db, "inventory", existing.id), {
-          qtyOld: newOld, qtyNew: newNew, qtyOffice: newOffice,
-          qty: total, isNew:true, updatedAt: serverTimestamp()
+          qtyOld: newOld, qtyNew: newNew, qtyOffice: newOffice, qty: newOld + newNew + newOffice, isNew:true
         });
-
-        addPreview({ name, qtyAdded: qty, location, total });
       } else {
         const qtyOld    = location === 'Old warehouse' ? qty : 0;
         const qtyNew    = location === 'New warehouse' ? qty : 0;
         const qtyOffice = location === 'Office'         ? qty : 0;
-        const total     = qtyOld + qtyNew + qtyOffice;
-
         await addDoc(colInventory, {
-          name, qtyOld, qtyNew, qtyOffice, qty: total,
-          goal: 0, img: null, isNew: true,
-          createdAt: serverTimestamp()
+          name, qtyOld, qtyNew, qtyOffice, qty: qtyOld + qtyNew + qtyOffice, goal:0, img:null, isNew:true, createdAt: serverTimestamp()
         });
-
-        addPreview({ name, qtyAdded: qty, location, total });
       }
       notify(`Item "${name}" added to ${location}.`);
-    } catch(err){
-      console.error(err);
-      notify('Failed to add item','error');
-    }
-
+    } catch(err){ console.error(err); notify('Failed to add item','error'); }
     document.getElementById('newItemName').value = '';
     document.getElementById('newItemQty').value = '';
-    document.getElementById('newItemName').focus();
   }
-
-  document.getElementById('btnAddItem').addEventListener('click', addNewItem);
-  document.getElementById('newItemName').addEventListener('keydown', (e)=>{ if (e.key==='Enter') addNewItem(); });
-  document.getElementById('newItemQty').addEventListener('keydown', (e)=>{ if (e.key==='Enter') addNewItem(); });
-
-  /* Tiny "Just added" preview so you can see writes immediately */
-  const pvBox  = document.getElementById('previewBox');
-  const pvList = document.getElementById('pvList');
-  function addPreview(row){
-    recentAdded.unshift(row);
-    recentAdded = recentAdded.slice(0,5);
-    pvBox.hidden = recentAdded.length === 0;
-    pvList.innerHTML = recentAdded.map(r =>
-      `<div class="pv-row"><div>${escapeHtml(r.name)} — added ${r.qtyAdded} to <strong>${escapeHtml(r.location)}</strong></div><div>Total now: <strong>${r.total}</strong></div></div>`
-    ).join('');
-  }
-  function escapeHtml(s){ return (s ?? '').toString().replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+  window.addNewItem = addNewItem;
 </script>
 </body>
 </html>
+```
