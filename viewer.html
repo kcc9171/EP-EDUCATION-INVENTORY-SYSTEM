@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory Viewer</title>
+  <!-- Favicon using your logo -->
+  <link rel="icon" href="https://media.licdn.com/dms/image/v2/C560BAQH1e7RqZpFCqA/company-logo_200_200/company-logo_200_200/0/1630649511750?e=2147483647&v=beta&t=Xt8U3KJxbI4FiV1rmcsehbP6Y2XdByD6pEP8X7K378g">
+  <style>
+    /* ==== Light theme based on #F7F4EA ==== */
+    :root{
+      --bg:#F7F4EA;        /* page background */
+      --panel:#EEE6D8;     /* cards / panels */
+      --ink:#1F2937;       /* primary text */
+      --muted:#6B7280;     /* muted text */
+      --line:#D9CFC1;      /* borders/outlines */
+      --accent:#0EA5A4;    /* teal accent */
+      --chip:#EDE7DA;      /* subtle chip bg */
+      --header-bg:#F0E8DB; /* soft header tint */
+      --shadow:0 12px 30px rgba(0,0,0,.08);
+    }
+
+    html,body{height:100%}
+    body{margin:0;font-family:Arial, sans-serif;background:var(--bg);color:var(--ink)}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+
+    /* top bar */
+    .bar{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:44px;height:44px;border-radius:10px;object-fit:cover;
+      box-shadow:0 6px 14px rgba(0,0,0,.08); border:1px solid var(--line); background:#fff;
+    }
+    .title{margin:0;font-size:34px;font-weight:800;color:var(--ink)}
+    .info{ margin:6px 0 0; color:var(--muted); }
+    .right{display:flex; align-items:center; gap:10px}
+    .signedas{color:var(--muted); font-size:13px}
+    .logout{padding:8px 12px;border:1px solid var(--accent);border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;transition:.15s}
+    .logout:hover{filter:brightness(.95)}
+
+    /* tabs & sections */
+    .tabs{display:flex;gap:8px;margin:10px 0 16px;flex-wrap:wrap}
+    .tab{padding:8px 12px;border:1px solid var(--line);background:var(--panel);border-radius:8px;cursor:pointer;transition:.15s}
+    .tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .tab:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .section{display:none}
+    .section.show{display:block}
+
+    /* common inputs/buttons */
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}
+    input[type="text"], select, button{
+      padding:8px 10px; border-radius:8px; border:1px solid var(--line);
+      background:var(--panel); color:var(--ink); caret-color:var(--ink);
+    }
+    input::placeholder{color:var(--muted);opacity:1}
+    button{cursor:pointer;transition:.15s}
+    button:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+    .pill{ padding:2px 8px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--ink); background:var(--chip); }
+
+    /* inventory grid */
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:16px; }
+    .card{
+      width:210px; height:260px; background:var(--panel); border-radius:16px; position:relative;
+      box-shadow:var(--shadow); border:1px solid var(--line); overflow:hidden; color:var(--ink);
+    }
+    .card__image{ height:110px; background:var(--header-bg); background-size:cover; background-position:center; border-bottom:1px solid var(--line); }
+    .qty-badge{ position:absolute; top:10px; right:10px; background:var(--ink); color:#fff; font-size:12px; padding:2px 6px; border-radius:999px; opacity:.92; }
+    .badge-low{ position:absolute; top:10px; left:10px; background:#e11d48; color:#fff; font-size:11px; padding:2px 6px; border-radius:999px; }
+    .content{ padding:12px; }
+    .name{ font-weight:700; margin:0 0 6px; }
+    .muted{ color:var(--muted); font-size:12px; }
+
+    table{ width:100%; border-collapse:collapse; background:var(--panel); color:var(--ink); }
+    th,td{ border:1px solid var(--line); padding:8px; text-align:left; }
+    thead th{ background:var(--header-bg); color:var(--muted); }
+
+    /* status cards */
+    .status-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+    .status-card{background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);color:var(--ink);display:flex;flex-direction:column;gap:10px;padding:14px 14px 12px}
+    .status-card__top{display:flex;align-items:center;justify-content:space-between;color:var(--muted);font-size:12px;gap:8px}
+    .status-card__title{font-weight:700;margin:2px 0 4px}
+    .status-meta{font-size:12px;color:var(--muted);display:grid;grid-template-columns:auto auto;gap:4px 14px}
+    .status-row{display:flex;justify-content:space-between;align-items:center;margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+    .status-chip{background:var(--chip);border-radius:999px;padding:2px 8px;font-size:12px}
+    .chip--loan{background:#DCFCE7;color:#065F46}
+    .chip--rent{background:#FEF3C7;color:#92400E}
+    .status-amt{font-weight:800}
+
+    /* location grid (read-only) */
+    .loc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+    .loc-card{width:190px;height:254px;background:var(--panel);border-radius:20px;position:relative;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);color:var(--ink)}
+    .loc-card__image{width:100%;height:100px;background:var(--header-bg);margin:0;overflow:hidden;background-size:cover;background-position:center;border-bottom:1px solid var(--line)}
+    .loc-card__text{display:flex;flex-direction:column;gap:.25em;padding:8px 12px}
+    .loc-card__title{font-size:1.05em;margin:4px 0 0;font-weight:700}
+    .loc-card__desc{color:var(--muted);font-size:.8em;margin:0 0 6px}
+    .loc-view{position:absolute;top:10px;right:10px;padding:0 8px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.9);cursor:pointer}
+    .loc-view[disabled]{opacity:.5;cursor:default}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="bar">
+      <div class="brand">
+        <img
+          class="logo"
+          alt="Company logo"
+          src="https://media.licdn.com/dms/image/v2/C560BAQH1e7RqZpFCqA/company-logo_200_200/company-logo_200_200/0/1630649511750?e=2147483647&v=beta&t=Xt8U3KJxbI4FiV1rmcsehbP6Y2XdByD6pEP8X7K378g"
+        />
+        <div>
+          <h1 class="title">Inventory (Read-only)</h1>
+          <p class="info">This page signs in anonymously and shows live data. Editing is disabled by design.</p>
+        </div>
+      </div>
+      <div class="right">
+        <span id="signedAs" class="signedas"></span>
+        <button id="logoutBtn" class="logout">Logout</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="inv">Inventory</div>
+      <div class="tab" data-tab="hist">History</div>
+      <div class="tab" data-tab="status">Status</div>
+      <div class="tab" data-tab="loc">Location</div>
+    </div>
+
+    <!-- Inventory -->
+    <section id="inv" class="section show">
+      <div class="toolbar">
+        <input id="inv-search" type="text" placeholder="Search items…" />
+        <span class="pill" id="inv-count">0 items</span>
+      </div>
+      <div id="grid" class="grid"></div>
+    </section>
+
+    <!-- History -->
+    <section id="hist" class="section">
+      <div class="toolbar">
+        <input id="hist-search" type="text" placeholder="Search item/name/purpose/location…" style="min-width:260px;">
+        <select id="hist-item-filter"><option value="">All items</option></select>
+        <span class="pill" id="hist-count">0 records</span>
+        <div style="flex:1"></div>
+        <button id="export-btn">Export CSV</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date/Time</th>
+            <th>Item</th>
+            <th>Location</th>
+            <th>Change</th>
+            <th>Qty After (Total)</th>
+            <th>By</th>
+            <th>Purpose / Reason</th>
+            <th>For / Adjusted by</th>
+          </tr>
+        </thead>
+        <tbody id="hist-body"></tbody>
+      </table>
+    </section>
+
+    <!-- Status (read-only) -->
+    <section id="status" class="section">
+      <div class="toolbar">
+        <input id="status-search" type="text" placeholder="Search order / item / remarks…" style="min-width:280px;">
+        <span class="pill" id="status-count">0 records</span>
+      </div>
+      <div id="statusList" class="status-list"></div>
+    </section>
+
+    <!-- Location (read-only) -->
+    <section id="loc" class="section">
+      <div class="toolbar">
+        <input id="loc-search" type="text" placeholder="Search location / notes…" style="min-width:260px;">
+        <span class="pill" id="loc-count">0 cards</span>
+      </div>
+      <div id="locationGrid" class="loc-grid"></div>
+    </section>
+  </div>
+
+  <!-- Firebase (read-only) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getAuth, signInAnonymously, signOut } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+    import {
+      getFirestore, collection, onSnapshot, query, orderBy, getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAL_C_bGiD-G_2g1jro7-OzxIlM0akRdTY",
+      authDomain: "epedu-inventory-database.firebaseapp.com",
+      projectId: "epedu-inventory-database",
+      storageBucket: "epedu-inventory-database.appspot.com",
+      messagingSenderId: "124437251040",
+      appId: "1:124437251040:web:4989c73efc2f4afbf22185"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    signInAnonymously(auth).catch(console.error);
+
+    // logout button
+    const CURRENT_USER = localStorage.getItem('auth_user') || 'Viewer';
+    const signedAsEl = document.getElementById('signedAs');
+    signedAsEl.textContent = `Signed in as ${CURRENT_USER}`;
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try { await signOut(auth); } catch(e) { /* ignore */ }
+      localStorage.removeItem('auth_v1');
+      localStorage.removeItem('auth_user');
+      localStorage.removeItem('auth_role');
+      localStorage.removeItem('auth_time');
+      location.replace('login.html');
+    });
+
+    // Firestore
+    const db = getFirestore(app);
+    const colInventory   = collection(db, "inventory");
+    const colAdjustments = collection(db, "adjustments");
+    const colStatuses    = collection(db, "statuses");
+    const colLocations   = collection(db, "locations");
+
+    // State
+    let inventory = [];
+    let adjustments = [];
+    let statuses = [];
+    let locations = [];
+
+    // Tabs
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(t => t.addEventListener('click', () => {
+      tabs.forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
+      t.classList.add('active');
+      document.getElementById(t.dataset.tab).classList.add('show');
+    }));
+
+    // Helpers
+    const $ = s => document.querySelector(s);
+    function esc(s){ return (s ?? '').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function toLocal(ts){ if(!ts) return ''; const d = ts.toDate ? ts.toDate() : new Date(ts); return isNaN(+d)?'':d.toLocaleString(); }
+    function csvEscape(v){ const s = (v ?? '').toString(); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; }
+
+    // ✅ Correct total quantity (supports Old/New/Office when present; falls back to qty)
+    function totalQty(item){
+      const hasSplit = (item.qtyOld !== undefined) || (item.qtyNew !== undefined) || (item.qtyOffice !== undefined);
+      if (hasSplit){
+        return (Number(item.qtyOld) || 0) + (Number(item.qtyNew) || 0) + (Number(item.qtyOffice) || 0);
+      }
+      const q = Number(item.qty);
+      return Number.isFinite(q) ? q : 0;
+    }
+
+    // Live listeners (read-only)
+    onSnapshot(colInventory, (snap) => {
+      inventory = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      renderInventory();
+      populateHistoryItemFilter();
+    });
+
+    const qAdj = query(colAdjustments, orderBy("ts","desc"));
+    onSnapshot(qAdj, (snap) => {
+      adjustments = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      renderHistory();
+      populateHistoryItemFilter();
+    });
+
+    onSnapshot(query(colStatuses, orderBy("ts","desc")), (snap) => {
+      statuses = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      renderStatuses();
+    });
+
+    onSnapshot(colLocations, (snap) => {
+      locations = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      renderLocations();
+    });
+
+    /* ---------------- Inventory render ---------------- */
+    $('#inv-search').addEventListener('input', renderInventory);
+    function renderInventory(){
+      const q = ($('#inv-search').value || '').trim().toLowerCase();
+      const rows = !q ? inventory : inventory.filter(i => (i.name||'').toLowerCase().includes(q));
+      $('#inv-count').textContent = `${rows.length} item${rows.length===1?'':'s'}`;
+      const grid = $('#grid'); grid.innerHTML = '';
+      rows.forEach(item => {
+        const total = totalQty(item);
+        const low = (Number(item.goal) > 0) && (total <= Number(item.goal));
+        const img = item.img ? `background-image:url('${esc(item.img)}')` : '';
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div class="card__image" style="${img}"></div>
+          <span class="qty-badge" title="Old: ${Number(item.qtyOld||0)}, New: ${Number(item.qtyNew||0)}, Office: ${Number(item.qtyOffice||0)}">Qty: ${total}</span>
+          ${low ? `<span class="badge-low">LOW</span>` : ``}
+          <div class="content">
+            <p class="name" title="${esc(item.name)}">${esc(item.name)}</p>
+            <p class="muted">Goal: ${Number(item.goal)||0}</p>
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    /* ---------------- History render ---------------- */
+    $('#hist-search').addEventListener('input', renderHistory);
+    $('#hist-item-filter').addEventListener('change', renderHistory);
+
+    function populateHistoryItemFilter(){
+      const sel = $('#hist-item-filter');
+      if (!sel) return;
+      const current = sel.value;
+      const names = Array.from(new Set(adjustments.map(a => a.item).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+      sel.innerHTML = '<option value="">All items</option>' + names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+      if ([...sel.options].some(o => o.value === current)) sel.value = current;
+    }
+
+    // ✅ mirror history.html behavior for the "person" field (takenBy → adjustedBy → forWhom)
+    function renderHistory(){
+      const tbody = $('#hist-body'); if (!tbody) return;
+      tbody.innerHTML = '';
+      let rows = adjustments.slice(); // already ordered desc
+      const q = ($('#hist-search').value || '').trim().toLowerCase();
+      const itemFilter = $('#hist-item-filter').value;
+
+      if (q) rows = rows.filter(r =>
+        (r.item||'').toLowerCase().includes(q) ||
+        (r.actor||'').toLowerCase().includes(q) ||
+        ((r.purpose ?? r.reason ?? '').toLowerCase().includes(q)) ||
+        ((r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '').toLowerCase().includes(q)) ||
+        ((r.location||'').toLowerCase().includes(q))
+      );
+
+      if (itemFilter) rows = rows.filter(r => r.item === itemFilter);
+
+      $('#hist-count').textContent = `${rows.length} record${rows.length===1?'':'s'}`;
+
+      for (const r of rows) {
+        const tr = document.createElement('tr');
+        const deltaStr = (r.delta > 0 ? '+' : '') + (r.delta ?? 0);
+        tr.innerHTML = `
+          <td>${toLocal(r.ts)}</td>
+          <td>${esc(r.item)}</td>
+          <td>${esc(r.location ?? '')}</td>
+          <td>${deltaStr}</td>
+          <td>${r.qtyAfter ?? ''}</td>
+          <td>${esc(r.actor ?? '')}</td>
+          <td>${esc(r.purpose ?? r.reason ?? '')}</td>
+          <td>${esc(r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '')}</td>`;
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Export CSV (read-only) — same fallback fields as table
+    document.getElementById('export-btn').addEventListener('click', async ()=>{
+      const snap = await getDocs(qAdj);
+      const rows = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+      const header = ['Date/Time','Item','Location','Change','Qty After (Total)','By (Name)','Purpose / Reason','For / Adjusted by'];
+      const csvRows = [header.join(',')];
+      for (const r of rows){
+        csvRows.push([
+          toLocal(r.ts),
+          csvEscape(r.item),
+          csvEscape(r.location ?? ''),
+          (r.delta>0?'+':'') + (r.delta ?? 0),
+          r.qtyAfter ?? '',
+          csvEscape(r.actor ?? ''),
+          csvEscape(r.purpose ?? r.reason ?? ''),
+          csvEscape(r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '')
+        ].join(','));
+      }
+      const BOM = "\uFEFF"; // Excel-friendly
+      const blob = new Blob([BOM + csvRows.join('\n')], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url;
+      a.download = `inventory-history-${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    /* ---------------- Status (read-only) ---------------- */
+    const stSearch = document.getElementById('status-search');
+    stSearch.addEventListener('input', renderStatuses);
+
+    function renderStatuses(){
+      const wrap = document.getElementById('statusList'); if (!wrap) return;
+      wrap.innerHTML = '';
+      let rows = statuses.slice();
+      const q = (stSearch?.value || '').trim().toLowerCase();
+      if (q) rows = rows.filter(r =>
+        (r.order||'').toLowerCase().includes(q) ||
+        (r.item||'').toLowerCase().includes(q) ||
+        (r.remarks||'').toLowerCase().includes(q)
+      );
+      document.getElementById('status-count').textContent = `${rows.length} record${rows.length===1?'':'s'}`;
+
+      for (const r of rows){
+        const div = document.createElement('div'); div.className='status-card';
+        const dt = r.ts?.toDate ? r.ts.toDate().toLocaleString() : (r.ts ? new Date(r.ts).toLocaleString() : '');
+        const chipClass = (r.status||'').toLowerCase()==='rent' ? 'chip--rent' : 'chip--loan';
+        div.innerHTML = `
+          <div class="status-card__top">
+            <span>${esc(dt || '')}</span>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span class="status-chip ${chipClass}">${esc(r.status || '')}</span>
+            </div>
+          </div>
+          <div class="status-card__title">Order: ${esc(r.order || '')}</div>
+          <div class="status-meta">
+            <div>Item Name</div><div>${esc(r.item || '')}</div>
+            <div>Quantity</div><div class="status-amt">${r.qty ?? ''}</div>
+          </div>
+          ${r.remarks ? `<div class="status-row"><div style="color:var(--muted);">Remarks</div><div>${esc(r.remarks)}</div></div>` : ''}`;
+        wrap.appendChild(div);
+      }
+    }
+
+    /* ---------------- Location (read-only) ---------------- */
+    const locSearch = document.getElementById('loc-search');
+    locSearch.addEventListener('input', renderLocations);
+
+    function renderLocations(){
+      const grid = document.getElementById('locationGrid'); if (!grid) return;
+      grid.innerHTML = '';
+      const q = (locSearch.value || '').trim().toLowerCase();
+      let rows = locations.slice();
+      if (q){
+        rows = rows.filter(l =>
+          (l.name||'').toLowerCase().includes(q) ||
+          (l.description||'').toLowerCase().includes(q)
+        );
+      }
+      document.getElementById('loc-count').textContent = `${rows.length} card${rows.length===1?'':'s'}`;
+
+      rows.forEach(loc => {
+        const card = document.createElement('div'); card.className='loc-card';
+        const bg = loc.img ? `background-image:url('${esc(loc.img)}')` : '';
+        card.innerHTML = `
+          <div class="loc-card__image" style="${bg}"></div>
+          <button class="loc-view" title="Open image" ${loc.img ? '' : 'disabled'}>View</button>
+          <div class="loc-card__text">
+            <div class="loc-card__title" title="${esc(loc.name)}">${esc(loc.name || '')}</div>
+            <p class="loc-card__desc">${esc(loc.description || '')}</p>
+          </div>`;
+        if (loc.img){
+          card.querySelector('.loc-view').addEventListener('click', ()=> window.open(loc.img, '_blank','noopener'));
+        }
+        grid.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
