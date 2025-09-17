@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -191,16 +192,14 @@
     onSnapshot, serverTimestamp, query, orderBy, getDocs, writeBatch
   } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
-  /* 🔁 UPDATED: new Firebase project config */
   const firebaseConfig = {
-    apiKey: "AIzaSyDcRIe_9vFcAhQgbwlhritecpj1iXtsv-M",
-    authDomain: "ep-education-inventory-system.firebaseapp.com",
-    databaseURL: "https://ep-education-inventory-system-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ep-education-inventory-system",
-    storageBucket: "ep-education-inventory-system.firebasestorage.app",
-    messagingSenderId: "378090475953",
-    appId: "1:378090475953:web:7c80e4eb3646d64825ed90",
-    measurementId: "G-BS11QEKE7Q"
+    apiKey: "AIzaSyAL_C_bGiD-G_2g1jro7-OzxIlM0akRdTY",
+    authDomain: "epedu-inventory-database.firebaseapp.com",
+    projectId: "epedu-inventory-database",
+    storageBucket: "epedu-inventory-database.appspot.com",
+    messagingSenderId: "124437251040",
+    appId: "1:124437251040:web:4989c73efc2f4afbf22185",
+    measurementId: "G-GFEEP49VRP"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -270,7 +269,7 @@
       (r.item||'').toLowerCase().includes(q) ||
       (r.actor||'').toLowerCase().includes(q) ||
       ((r.reason ?? r.purpose ?? '').toLowerCase().includes(q)) ||
-      // include 'takenBy' in search as well
+      // ✅ include 'takenBy' in search as well
       ((r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '').toLowerCase().includes(q)) ||
       ((r.location ?? '').toLowerCase().includes(q))
     );
@@ -285,9 +284,9 @@
       const dtStr = toLocalDateTime(r.ts);
       const deltaStr = (r.delta > 0 ? '+' : '') + (r.delta ?? 0);
 
-      // show reason (delete uses 'reason', adjust uses 'purpose')
+      // ✅ show reason (delete uses 'reason', adjust uses 'purpose')
       const reason = r.reason ?? r.purpose ?? '';
-      // show whoever actually took it: takenBy OR adjustedBy OR forWhom
+      // ✅ FIX: show whoever actually took it: takenBy OR adjustedBy OR forWhom
       const adjustedFor = r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '';
 
       tr.innerHTML = `
@@ -312,6 +311,7 @@
     const csvRows = [header.join(',')];
     for (const r of rows){
       const reason = r.reason ?? r.purpose ?? '';
+      // ✅ include takenBy for export too
       const adjustedFor = r.takenBy ?? r.adjustedBy ?? r.forWhom ?? '';
       csvRows.push([
         toLocalDateTime(r.ts),
