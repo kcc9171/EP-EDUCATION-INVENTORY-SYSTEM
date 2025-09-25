@@ -3,44 +3,40 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Account Admin — Create & Manage</title>
+<title>Accounts — Admin</title>
 <link rel="icon" href="https://media.licdn.com/dms/image/v2/C560BAQH1e7RqZpFCqA/company-logo_200_200/company-logo_200_200/0/1630649511750?e=2147483647&v=beta&t=Xt8U3KJxbI4FiV1rmcsehbP6Y2XdByD6pEP8X7K378g">
 <style>
   :root{
     --bg:#F7F4EA; --panel:#EEE6D8; --ink:#1F2937; --muted:#6B7280;
-    --line:#D9CFC1; --accent:#0EA5A4; --shadow:0 8px 24px rgba(0,0,0,.08);
-    --chip:#EDE7DA;
+    --line:#D9CFC1; --accent:#0EA5A4; --shadow:0 12px 30px rgba(0,0,0,.08);
+    --chip:#EDE7DA; --header:#F0E8DB;
   }
   *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
-       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-  .wrap{max-width:960px;margin:0 auto;padding:18px}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Arial,system-ui}
+  .wrap{max-width:1060px;margin:0 auto;padding:18px}
   .bar{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:10px}
   .brand{display:flex;align-items:center;gap:12px}
-  .logo{width:40px;height:40px;border-radius:10px;object-fit:cover;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
+  .logo{width:44px;height:44px;border-radius:10px;object-fit:cover;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow)}
   h1{margin:0}
   .muted{color:var(--muted)}
-  .pill{padding:2px 8px;border:1px solid var(--line);border-radius:999px;background:var(--chip);font-size:12px}
   .btn{padding:8px 12px;border:1px solid var(--accent);border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;transition:.15s}
   .btn:hover{filter:brightness(.95)}
   .btn--ghost{background:transparent;color:var(--ink)}
-  .btn--danger{border-color:#b91c1c;background:#b91c1c}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px}
+  .btn--danger{background:#b91c1c;border-color:#b91c1c}
   .tabs{display:flex;gap:8px;margin:8px 0 14px;flex-wrap:wrap}
   .tab{padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);cursor:pointer}
   .tab.active,.tab:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
   .section{display:none}.section.show{display:block}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);padding:16px}
   label{display:block;font-size:14px;margin:.25rem 0}
   input,select{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
-  .grid{display:grid;grid-template-columns:1fr 1fr 160px;gap:10px;align-items:end;max-width:720px}
+  .grid{display:grid;grid-template-columns:1fr 1fr 200px;gap:12px;align-items:end;max-width:760px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .pill{padding:2px 8px;border:1px solid var(--line);border-radius:999px;background:var(--chip);font-size:12px}
+  .note{font-size:12px;color:var(--muted);margin-top:6px}
   table{width:100%;border-collapse:collapse;background:var(--panel);color:var(--ink)}
   th,td{border:1px solid var(--line);padding:8px;text-align:left}
-  thead th{background:#F0E8DB;color:var(--muted)}
-  .row-actions{display:flex;gap:8px}
-  .note{font-size:12px;color:var(--muted);margin-top:6px}
-  .toolbar{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:10px 0}
-  .right{display:flex;gap:8px;align-items:center}
-  .chip{border:1px solid var(--line);background:var(--chip);border-radius:999px;padding:2px 8px;font-size:12px}
+  thead th{background:var(--header);color:var(--muted)}
 </style>
 </head>
 <body>
@@ -48,22 +44,23 @@
     <div class="bar">
       <div class="brand">
         <img class="logo" alt="Company logo"
-          src="https://media.licdn.com/dms/image/v2/C560BAQH1e7RqZpFCqA/company-logo_200_200/company-logo_200_200/0/1630649511750?e=2147483647&v=beta&t=Xt8U3KJxbI4FiV1rmcsehbP6Y2XdByD6pEP8X7K378g"/>
+             src="https://media.licdn.com/dms/image/v2/C560BAQH1e7RqZpFCqA/company-logo_200_200/company-logo_200_200/0/1630649511750?e=2147483647&v=beta&t=Xt8U3KJxbI4FiV1rmcsehbP6Y2XdByD6pEP8X7K378g"/>
         <div>
-          <h1>Account Admin</h1>
-          <div class="muted">Create & manage user accounts (admin only)</div>
+          <h1>Accounts</h1>
+          <div class="muted">Create & manage users (admin only)</div>
         </div>
       </div>
-      <div class="right">
+      <div class="row">
+        <a class="btn btn--ghost" href="viewer.html">Viewer</a>
+        <a class="btn btn--ghost" href="index.html">Editor Tools</a>
         <span id="signedAs" class="muted"></span>
-        <button id="backBtn" class="btn btn--ghost" title="Back to app">← Back</button>
         <button id="logoutBtn" class="btn">Logout</button>
       </div>
     </div>
 
     <div class="tabs">
       <div class="tab active" data-tab="create">Create Account</div>
-      <div class="tab" data-tab="manage">Manage Accounts</div>
+      <div class="tab" data-tab="manage">Manage Account</div>
     </div>
 
     <!-- Create -->
@@ -85,48 +82,40 @@
               <option value="editor">editor</option>
             </select>
           </div>
-          <div style="grid-column:1/-1;display:flex;gap:10px">
-            <button id="createBtn" class="btn">Create Account</button>
-            <button id="resetCreate" class="btn btn--ghost">Clear</button>
-          </div>
         </div>
-        <div class="note">Usernames are case-sensitive. You can change roles later in “Manage Accounts”.</div>
+        <div class="row" style="margin-top:12px">
+          <button id="createBtn" class="btn">Create Account</button>
+          <button id="resetBtn" class="btn btn--ghost">Clear</button>
+        </div>
+        <div class="note">Usernames are case-sensitive. Creating new admins here is disabled.</div>
       </div>
     </section>
 
     <!-- Manage -->
     <section id="manage" class="section">
-      <div class="toolbar">
-        <div class="muted">All accounts</div>
-        <div><span id="acctCount" class="chip">0 users</span></div>
+      <div class="card" style="overflow:auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Role</th>
+              <th>Password</th>
+              <th style="width:220px">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="acctBody"></tbody>
+        </table>
       </div>
-      <div class="card">
-        <div style="overflow:auto">
-          <table>
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Password</th>
-                <th style="width:210px">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="acctBody"></tbody>
-          </table>
-        </div>
-        <div class="note">Protected users (e.g. admin/system) cannot be deleted or demoted.</div>
-      </div>
+      <div class="note">Protected users cannot be deleted or demoted.</div>
     </section>
   </div>
 
 <script>
-/** ---------- Access Gate (admin only) ---------- */
+/* --------- Auth gate: only admin --------- */
 const ok   = localStorage.getItem('auth_v1') === 'ok';
 const role = localStorage.getItem('auth_role');
 const user = localStorage.getItem('auth_user') || '';
 if (!ok || role !== 'admin') { window.location.replace('login.html'); }
-
-/** ---------- UI Basics ---------- */
 document.getElementById('signedAs').textContent = `Signed in as ${user} (admin)`;
 document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('auth_v1');
@@ -135,175 +124,126 @@ document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('auth_time');
   window.location.replace('login.html');
 });
-document.getElementById('backBtn').addEventListener('click', () => {
-  // send admins to index.html (editor tools). Change if you want a different landing page.
-  window.location.href = 'index.html';
-});
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
+
+/* --------- UI tabs --------- */
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('show'));
     t.classList.add('active');
     document.getElementById(t.dataset.tab).classList.add('show');
   });
 });
 
-/** ---------- Accounts Store (localStorage) ---------- */
+/* --------- Accounts store (localStorage) --------- */
 const ACCOUNTS_KEY = 'accounts_v1';
-// Hard-protected usernames/roles (cannot delete; cannot change role away from their enforced role)
-const PROTECTED = {
-  'EPEDUADMIN': 'admin'
-};
+const PROTECTED = { 'EPEDUADMIN': 'admin' }; // cannot delete or demote
 
-// Seed defaults if missing (same users you had + admin)
-function seedIfMissing() {
+// Seed first run with your existing users + admin
+function seedIfMissing(){
   if (localStorage.getItem(ACCOUNTS_KEY)) return;
   const seeded = {
     "EPEDU":     { hash: "dcb29d675b72d042c839362546f63501afd9130965b0193b1718c2e6bd99ca80", role: "editor" },
     "gwenntan":  { hash: "9440524470c0fd7f13b67eeb3a56354a46158c04f82b660f50fa96da3b481b48", role: "editor" },
     "EPSUPPORT": { hash: "844bfaecdd264b1422e6ccb9bd789757fe34c358d76edf2d0790e0b0997882e3", role: "viewer" },
     "Sally Kan": { hash: "d3dc9ee2aecc08b4b60b1258449a96c5b0ee80bb61964915f2918a4b36dbe39b", role: "editor" },
-    // NEW admin:
-    "EPEDUADMIN": { hash: "6c92215682dcb0759435e1f2b971489706180f64f145029e2d46ef9d0db54507", role: "admin" }
+    /* Admin: EPEDUADMIN / EPEDUADMIN2000 */
+    "EPEDUADMIN":{ hash: "6c92215682dcb0759435e1f2b971489706180f64f145029e2d46ef9d0db54507", role: "admin" }
   };
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(seeded));
 }
 seedIfMissing();
 
-function loadAccounts() {
-  try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY)) || {}; }
-  catch { return {}; }
-}
-function saveAccounts(obj) {
-  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(obj));
-}
+function loadAccounts(){ try{ return JSON.parse(localStorage.getItem(ACCOUNTS_KEY)) || {}; }catch{ return {}; } }
+function saveAccounts(obj){ localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(obj)); }
 
-/** ---------- Helpers ---------- */
-async function sha256Hex(text) {
+/* --------- Helpers --------- */
+async function sha256Hex(text){
   const enc = new TextEncoder().encode(text);
   const hash = await crypto.subtle.digest('SHA-256', enc);
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-function showToast(msg, type='info') {
-  alert(msg); // keep simple; reuse your toast system if you prefer
-}
+function toast(m){ alert(m); }
 
-/** ---------- Create Account ---------- */
-const newUserEl = document.getElementById('new-username');
-const newPassEl = document.getElementById('new-password');
-const newRoleEl = document.getElementById('new-role');
-document.getElementById('resetCreate').addEventListener('click', () => {
-  newUserEl.value = ''; newPassEl.value = ''; newRoleEl.value = 'viewer';
+/* --------- Create tab --------- */
+const uEl = document.getElementById('new-username');
+const pEl = document.getElementById('new-password');
+const rEl = document.getElementById('new-role');
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  uEl.value=''; pEl.value=''; rEl.value='viewer';
 });
-document.getElementById('createBtn').addEventListener('click', async () => {
-  const username = (newUserEl.value || '').trim();
-  const password = (newPassEl.value || '').trim();
-  const role     = newRoleEl.value;
-
-  if (!username || !password) { showToast('Enter username and password','warn'); return; }
+document.getElementById('createBtn').addEventListener('click', async ()=>{
+  const username = (uEl.value||'').trim();
+  const password = (pEl.value||'').trim();
+  const role = rEl.value;
+  if (!username || !password){ toast('Enter username and password'); return; }
   const accounts = loadAccounts();
-  if (accounts[username]) { showToast('That username already exists.','warn'); return; }
-  if (role === 'admin') { showToast('Creating new admin users is disabled here.','warn'); return; }
-
-  const hash = await sha256Hex(password);
-  accounts[username] = { hash, role };
+  if (accounts[username]){ toast('That username already exists'); return; }
+  if (role === 'admin'){ toast('Creating new admin accounts is disabled'); return; }
+  accounts[username] = { hash: await sha256Hex(password), role };
   saveAccounts(accounts);
-  showToast(`Created user "${username}" as ${role}.`);
-  newUserEl.value = ''; newPassEl.value = ''; newRoleEl.value = 'viewer';
+  toast(`Created "${username}" as ${role}`);
+  uEl.value=''; pEl.value=''; rEl.value='viewer';
   renderManage();
 });
 
-/** ---------- Manage Accounts ---------- */
-const acctBody = document.getElementById('acctBody');
-const acctCount = document.getElementById('acctCount');
-
-function renderManage() {
+/* --------- Manage tab --------- */
+const tbody = document.getElementById('acctBody');
+function renderManage(){
   const accounts = loadAccounts();
   const entries = Object.entries(accounts).sort((a,b)=>a[0].localeCompare(b[0]));
-  acctCount.textContent = `${entries.length} user${entries.length===1?'':'s'}`;
-  acctBody.innerHTML = '';
-
-  for (const [username, data] of entries) {
+  tbody.innerHTML = '';
+  for (const [username, data] of entries){
+    const id = username.replace(/\W/g,'_');
+    const prot = PROTECTED[username];
     const tr = document.createElement('tr');
-
-    // Role cell with dropdown
-    const roleSelId = `role-${username.replace(/\W/g,'_')}`;
-    const protectedRole = PROTECTED[username];
-    const canChangeRole = !protectedRole;
-
     tr.innerHTML = `
-      <td>${username in PROTECTED ? `${username} <span class="pill" title="Protected">locked</span>` : username}</td>
-      <td>${canChangeRole ? `
-          <select id="${roleSelId}">
-            <option value="viewer"${data.role==='viewer'?' selected':''}>viewer</option>
-            <option value="editor"${data.role==='editor'?' selected':''}>editor</option>
-          </select>` : `<span class="pill">admin</span>`}
-      </td>
+      <td>${username}${prot? ' <span class="pill" title="Protected">locked</span>':''}</td>
+      <td>${
+        prot ? `<span class="pill">admin</span>` :
+        `<select id="role-${id}">
+           <option value="viewer"${data.role==='viewer'?' selected':''}>viewer</option>
+           <option value="editor"${data.role==='editor'?' selected':''}>editor</option>
+         </select>`
+      }</td>
+      <td><input type="text" id="pw-${id}" placeholder="Set new password"/></td>
       <td>
-        <input type="text" id="pw-${roleSelId}" placeholder="Set new password" />
-      </td>
-      <td>
-        <div class="row-actions">
-          <button class="btn btn--ghost" data-act="save"   data-u="${username}">Save</button>
-          <button class="btn btn--danger" data-act="delete" data-u="${username}">Delete</button>
+        <div class="row">
+          <button class="btn btn--ghost" data-act="save" data-u="${username}">Save</button>
+          <button class="btn btn--danger" data-act="del"  data-u="${username}">Delete</button>
         </div>
       </td>
     `;
-
-    acctBody.appendChild(tr);
+    tbody.appendChild(tr);
   }
 
-  // Wire actions
-  acctBody.querySelectorAll('button[data-act]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      const act = btn.dataset.act;
-      const u   = btn.dataset.u;
+  tbody.querySelectorAll('button[data-act]').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const act = btn.dataset.act, u = btn.dataset.u;
       const accounts = loadAccounts();
+      if (!accounts[u]){ toast('User not found'); return; }
 
-      if (!accounts[u]) { showToast('User not found','error'); return; }
-
-      // Protect system/admin
-      if (u in PROTECTED) {
-        if (act === 'delete') { showToast('Cannot delete protected/admin account','warn'); return; }
-      }
-
-      if (act === 'delete') {
+      if (act === 'del'){
+        if (u in PROTECTED){ toast('Cannot delete protected/admin account'); return; }
         delete accounts[u];
-        saveAccounts(accounts);
-        showToast(`Deleted user "${u}".`);
-        renderManage();
-        return;
+        saveAccounts(accounts); toast(`Deleted "${u}"`); renderManage(); return;
       }
 
-      if (act === 'save') {
-        // Role change
-        const roleSel = document.getElementById(`role-${u.replace(/\W/g,'_')}`);
-        if (roleSel) {
-          const newRole = roleSel.value;
-          accounts[u].role = newRole;
+      if (act === 'save'){
+        if (!(u in PROTECTED)){
+          const roleSel = document.getElementById(`role-${u.replace(/\W/g,'_')}`);
+          if (roleSel) accounts[u].role = roleSel.value;
         }
-
-        // Password reset (if provided)
-        const pwEl = document.getElementById(`pw-role-${u.replace(/\W/g,'_')}`);
-        const pwElAlt = document.getElementById(`pw-${`role-${u.replace(/\W/g,'_')}`}`); // actual id used above
-        const pwField = pwElAlt || pwEl;
-        const newPw = (pwField?.value || '').trim();
-        if (newPw) {
-          accounts[u].hash = await sha256Hex(newPw);
-        }
-
-        saveAccounts(accounts);
-        if (pwField) pwField.value = '';
-        showToast(`Saved changes for "${u}".`);
-        renderManage();
+        const pwEl = document.getElementById(`pw-${u.replace(/\W/g,'_')}`);
+        const newPw = (pwEl?.value||'').trim();
+        if (newPw){ accounts[u].hash = await sha256Hex(newPw); pwEl.value=''; }
+        saveAccounts(accounts); toast(`Saved "${u}"`); renderManage(); return;
       }
     });
   });
 }
-
 renderManage();
 </script>
 </body>
 </html>
-
-
