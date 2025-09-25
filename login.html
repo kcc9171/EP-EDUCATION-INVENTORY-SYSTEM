@@ -21,8 +21,6 @@
   button{margin-top:14px;width:100%;padding:10px 12px;border:1px solid var(--accent);border-radius:8px;background:var(--accent);color:#fff;font-size:16px;cursor:pointer;transition:filter .15s,transform .02s}
   button:hover{filter:brightness(.95)} button:active{transform:translateY(1px)}
   .err{color:#b91c1c;font-size:14px;min-height:18px;margin-top:8px;text-align:center}
-  .admin-tip{margin-top:10px;text-align:center;font-size:12px}
-  .admin-tip a{color:inherit}
 </style>
 </head>
 <body>
@@ -41,72 +39,68 @@
       <input id="pw" type="password" required placeholder="Enter password" autocomplete="current-password" />
       <button type="submit">Sign in</button>
       <div id="err" class="err" role="alert" aria-live="polite"></div>
-      <div class="admin-tip muted">Admin page: <a href="accounts.html">accounts.html</a> (admin only)</div>
     </form>
   </div>
 
 <script>
-/** ---------- Local accounts store ---------- */
+/* ---- Local accounts store ---- */
 const ACCOUNTS_KEY = 'accounts_v1';
 function seedIfMissing(){
   if (localStorage.getItem(ACCOUNTS_KEY)) return;
   const seeded = {
-    // Existing
     "EPEDU":     { hash: "dcb29d675b72d042c839362546f63501afd9130965b0193b1718c2e6bd99ca80", role: "editor" },
     "gwenntan":  { hash: "9440524470c0fd7f13b67eeb3a56354a46158c04f82b660f50fa96da3b481b48", role: "editor" },
     "EPSUPPORT": { hash: "844bfaecdd264b1422e6ccb9bd789757fe34c358d76edf2d0790e0b0997882e3", role: "viewer" },
     "Sally Kan": { hash: "d3dc9ee2aecc08b4b60b1258449a96c5b0ee80bb61964915f2918a4b36dbe39b", role: "editor" },
-    // NEW admin:
-    "EPEDUADMIN": { hash: "6c92215682dcb0759435e1f2b971489706180f64f145029e2d46ef9d0db54507", role: "admin" }
+    /* Admin: EPEDUADMIN / EPEDUADMIN2000 */
+    "EPEDUADMIN":{ hash: "6c92215682dcb0759435e1f2b971489706180f64f145029e2d46ef9d0db54507", role: "admin" }
   };
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(seeded));
 }
 seedIfMissing();
-function loadAccounts(){
-  try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY)) || {}; }
-  catch { return {}; }
-}
 
-/** ---------- Login logic ---------- */
-async function sha256Hex(text) {
+function loadAccounts(){ try { return JSON.parse(localStorage.getItem(ACCOUNTS_KEY)) || {}; } catch { return {}; } }
+
+/* ---- Login logic ---- */
+async function sha256Hex(text){
   const enc = new TextEncoder().encode(text);
   const hash = await crypto.subtle.digest('SHA-256', enc);
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
 }
+
 const form = document.getElementById('login-form');
 const err  = document.getElementById('err');
-const userInput = document.getElementById('username');
-const pwInput   = document.getElementById('pw');
-
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  err.textContent = '';
-  const username = userInput.value.trim();
-  const pw       = pwInput.value;
-  if (!username || !pw) { err.textContent = 'Please fill in both fields.'; return; }
+form.addEventListener('submit', async (e)=>{
+  e.preventDefault(); err.textContent='';
+  const username = document.getElementById('username').value.trim();
+  const pw       = document.getElementById('pw').value;
+  if (!username || !pw){ err.textContent='Please fill in both fields.'; return; }
 
   const accounts = loadAccounts();
   const acct = accounts[username];
-  if (!acct) { err.textContent = 'Invalid username.'; return; }
+  if (!acct){ err.textContent='Invalid username.'; return; }
 
   const givenHash = await sha256Hex(pw);
-  if (givenHash !== acct.hash) { err.textContent = 'Invalid password.'; return; }
+  if (givenHash !== acct.hash){ err.textContent='Invalid password.'; return; }
 
   localStorage.setItem('auth_v1','ok');
   localStorage.setItem('auth_user', username);
   localStorage.setItem('auth_role', acct.role);
   localStorage.setItem('auth_time', String(Date.now()));
 
-  // Route by role (admin/editors go to index; viewers go to viewer)
-  if (acct.role === 'viewer')      location.href = 'viewer.html';
-  else /* editor or admin */       location.href = 'index.html';
+  // Route by role
+  if (acct.role === 'admin')       location.href = 'account.html';  // << admin → account.html
+  else if (acct.role === 'viewer') location.href = 'viewer.html';
+  else                              location.href = 'index.html';   // editor
 });
 
 // Already authenticated?
 const ok   = localStorage.getItem('auth_v1') === 'ok';
 const role = localStorage.getItem('auth_role');
 if (ok && role) {
-  location.replace(role === 'viewer' ? 'viewer.html' : 'index.html');
+  if (role === 'admin')      location.replace('account.html');
+  else if (role === 'viewer')location.replace('viewer.html');
+  else                       location.replace('index.html');
 }
 </script>
 </body>
