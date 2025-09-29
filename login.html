@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -115,7 +114,7 @@
   </div>
 
   <script>
-    // username -> { hash: <SHA-256 hex of password>, role: 'editor' | 'viewer' }
+    // username -> { hash: <SHA-256 hex of password>, role: 'admin' | 'editor' | 'viewer' }
     const ACCOUNTS = {
       // EPEDU : EPEDU2025SECURELOGIN
       "EPEDU":     { hash: "dcb29d675b72d042c839362546f63501afd9130965b0193b1718c2e6bd99ca80", role: "editor" },
@@ -123,14 +122,23 @@
       "gwenntan":  { hash: "9440524470c0fd7f13b67eeb3a56354a46158c04f82b660f50fa96da3b481b48", role: "editor" },
       // EPSUPPORT : EPSUPPORTISTHEBEST2025  -> viewer
       "EPSUPPORT": { hash: "844bfaecdd264b1422e6ccb9bd789757fe34c358d76edf2d0790e0b0997882e3", role: "viewer" },
-      // NEW — Sally Kan : Epasia0507  -> editor (change to "viewer" if you prefer)
-      "Sally Kan": { hash: "d3dc9ee2aecc08b4b60b1258449a96c5b0ee80bb61964915f2918a4b36dbe39b", role: "editor" }
+      // Sally Kan : Epasia0507  -> editor
+      "Sally Kan": { hash: "d3dc9ee2aecc08b4b60b1258449a96c5b0ee80bb61964915f2918a4b36dbe39b", role: "editor" },
+
+      // NEW — Master admin: EPEDUADMIN / EPEDUADMIN2000
+      "EPEDUADMIN": { hash: "6c92215682dcb0759435e1f2b971489706180f64f145029e2d46ef9d0db54507", role: "admin" }
     };
 
     async function sha256Hex(text) {
       const enc = new TextEncoder().encode(text);
       const hash = await crypto.subtle.digest('SHA-256', enc);
       return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+
+    function routeForRole(role) {
+      if (role === 'viewer') return 'viewer.html';
+      if (role === 'admin')  return 'accounts.html'; // admin → account manager
+      return 'index.html'; // editors (and anything else) → tools
     }
 
     const form = document.getElementById('login-form');
@@ -162,14 +170,14 @@
       localStorage.setItem('auth_role', acct.role);
       localStorage.setItem('auth_time', String(Date.now()));
 
-      location.href = (acct.role === 'viewer') ? 'viewer.html' : 'index.html';
+      location.href = routeForRole(acct.role);
     });
 
     // Already authenticated? send to the correct page.
     const ok   = localStorage.getItem('auth_v1') === 'ok';
     const role = localStorage.getItem('auth_role');
     if (ok && role) {
-      location.replace(role === 'viewer' ? 'viewer.html' : 'index.html');
+      location.replace(routeForRole(role));
     }
   </script>
 </body>
