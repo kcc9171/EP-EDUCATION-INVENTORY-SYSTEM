@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,18 +19,16 @@
 </script>
 
 <style>
-  /* ==== Light theme based on #F7F4EA ==== */
   :root{
     --nav-w:260px;
 
-    /* Theme */
-    --bg:#F7F4EA;        /* paper background */
-    --panel:#EEE6D8;     /* cards / panels */
-    --ink:#1F2937;       /* primary text */
-    --muted:#6B7280;     /* muted text */
-    --line:#D9CFC1;      /* borders/outlines */
-    --accent:#0EA5A4;    /* teal accent */
-    --chip:#EDE7DA;      /* chips/pills */
+    --bg:#F7F4EA;
+    --panel:#EEE6D8;
+    --ink:#1F2937;
+    --muted:#6B7280;
+    --line:#D9CFC1;
+    --accent:#0EA5A4;
+    --chip:#EDE7DA;
   }
 
   html,body{height:100%}
@@ -51,7 +48,7 @@
     border:1px solid var(--line);
     caret-color:var(--ink);
   }
-  input::placeholder, textarea::placeholder{ color:var(--muted); opacity:1 }
+  input::placeholder{ color:var(--muted); opacity:1 }
 
   button{
     border-radius:8px;
@@ -77,10 +74,7 @@
     position:fixed;left:12px;top:12px;width:32px;display:flex;flex-direction:column;gap:7px;
     cursor:pointer;user-select:none;z-index:1200;transition:transform .3s
   }
-  .hamburger .bar{
-    height:3px;background:var(--ink);border-radius:10px;
-    transition:transform .35s,opacity .25s,width .35s
-  }
+  .hamburger .bar{height:3px;background:var(--ink);border-radius:10px;transition:.3s}
   .hamburger .bar1,.hamburger .bar3{width:18px}.hamburger .bar2{width:28px}
   #menu-check:checked+label.hamburger{transform:translateX(var(--nav-w))}
   #menu-check:checked+label.hamburger .bar1{transform:translateY(10px) rotate(45deg);width:28px}
@@ -107,6 +101,35 @@
   .toast-wrap{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:10000}
   .toast{background:#E9E2D6;color:var(--ink);padding:10px 12px;border-radius:8px;box-shadow:0 10px 30px rgba(0,0,0,.12)}
   .toast--warn{background:#F2C97D;color:#4A2E00}.toast--error{background:#F3B8B8;color:#711313}.toast__close{margin-left:12px;cursor:pointer;font-weight:700}
+
+  /* Notification bell */
+  .notif-bell{
+    position:fixed;top:14px;right:18px;z-index:1200;
+    cursor:pointer;font-size:22px;color:var(--ink)
+  }
+  .notif-badge{
+    position:absolute;top:6px;right:6px;background:#e11d48;
+    color:#fff;font-size:11px;padding:2px 6px;border-radius:999px;
+    font-weight:600
+  }
+
+  /* Notification panel */
+  .notif-panel{
+    position:fixed;top:50px;right:16px;width:320px;max-height:70vh;
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);overflow:auto;z-index:1300;
+    display:none;flex-direction:column
+  }
+  .notif-header{
+    padding:12px;border-bottom:1px solid var(--line);font-weight:bold;
+    background:#F0E8DB;color:var(--ink)
+  }
+  .notif-item{
+    padding:12px;border-bottom:1px solid var(--line);font-size:14px;
+    display:flex;justify-content:space-between;align-items:center
+  }
+  .notif-item.low{background:#F3ECDD}
+  .notif-empty{padding:16px;text-align:center;color:var(--muted);font-size:14px}
 </style>
 
 <!-- Chart.js -->
@@ -118,6 +141,16 @@
 <label for="menu-check" class="hamburger" aria-label="Toggle menu" aria-controls="side" role="button" tabindex="0">
   <span class="bar bar1"></span><span class="bar bar2"></span><span class="bar bar3"></span>
 </label>
+
+<!-- Notification bell -->
+<div id="notifBell" class="notif-bell" title="Low stock notifications">
+  🔔
+  <span id="notifBadge" class="notif-badge" style="display:none">0</span>
+</div>
+<div id="notifPanel" class="notif-panel">
+  <div class="notif-header">Low Stock Alerts</div>
+  <div id="notifList"></div>
+</div>
 
 <nav class="sidebar" id="side" role="navigation" aria-label="Main">
   <a href="index.html">Add New Stock</a>
@@ -158,7 +191,6 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-analytics.js";
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
   import { getFirestore, collection, doc, updateDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
@@ -168,20 +200,13 @@
     projectId: "epedu-inventory-database",
     storageBucket: "epedu-inventory-database.appspot.com",
     messagingSenderId: "124437251040",
-    appId: "1:124437251040:web:4989c73efc2f4afbf22185",
-    measurementId: "G-GFEEP49VRP"
+    appId: "1:124437251040:web:4989c73efc2f4afbf22185"
   };
 
   const app = initializeApp(firebaseConfig);
-  try { getAnalytics(app); } catch(e) {}
   const auth = getAuth(app);
   const db   = getFirestore(app);
   signInAnonymously(auth).catch(console.error);
-
-  const menuCheck = document.getElementById('menu-check');
-  const hamb = document.querySelector('label.hamburger');
-  function syncAria(){ hamb.setAttribute('aria-expanded', String(menuCheck.checked)); }
-  menuCheck.addEventListener('change', syncAria); syncAria();
 
   const toastWrap = document.getElementById('toast-wrap');
   function toast(msg, type='info', timeout=3200){
@@ -201,13 +226,13 @@
   onSnapshot(colInventory, (snap) => {
     inventory = snap.docs.map(d => ({ id:d.id, ...d.data() }));
     renderGoalTable();
+    updateNotifications();
   });
 
   function renderGoalTable(){
     const tbody = document.querySelector('#goalTable tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
-
     const rows = inventory.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''));
     for (const item of rows){
       const currentGoal = Number.isFinite(item.goal) ? item.goal : 0;
@@ -216,15 +241,13 @@
         <td>${escapeHtml(item.name || '')}</td>
         <td>${currentGoal}</td>
         <td>
-          <input
-            type="number" min="0" step="1" value="${currentGoal}"
+          <input type="number" min="0" step="1" value="${currentGoal}"
             inputmode="numeric" data-goal-input="${item.id}" aria-label="New goal for ${escapeHtml(item.name || '')}"
-            style="width:140px"
-          >
+            style="width:140px">
         </td>
         <td>
-          <button data-save-goal="${item.id}" aria-label="Save goal for ${escapeHtml(item.name || '')}">Save</button>
-          <button data-clear-goal="${item.id}" title="Set goal to 0" aria-label="Clear goal for ${escapeHtml(item.name || '')}">Clear</button>
+          <button data-save-goal="${item.id}">Save</button>
+          <button data-clear-goal="${item.id}">Clear</button>
         </td>`;
       tbody.appendChild(tr);
     }
@@ -239,9 +262,7 @@
         try{
           await updateDoc(doc(db,'inventory', id), { goal: val });
           notify('Goal saved');
-        }catch(err){
-          console.error(err); notify('Failed to save goal','error');
-        }
+        }catch(err){ console.error(err); notify('Failed to save goal','error'); }
       });
     });
 
@@ -251,9 +272,7 @@
         try{
           await updateDoc(doc(db,'inventory', id), { goal: 0 });
           notify('Goal cleared');
-        }catch(err){
-          console.error(err); notify('Failed to clear goal','error');
-        }
+        }catch(err){ console.error(err); notify('Failed to clear goal','error'); }
       });
     });
 
@@ -267,7 +286,6 @@
       });
     });
 
-    // render chart too
     renderGoalChart();
   }
 
@@ -275,7 +293,6 @@
   function renderGoalChart() {
     const ctx = document.getElementById('goalChart');
     if (!ctx) return;
-
     const rows = inventory.slice().sort((a,b)=> (a.name||'').localeCompare(b.name||''));
     const labels = rows.map(item => item.name || '');
     const goals  = rows.map(item => Number.isFinite(item.goal) ? item.goal : 0);
@@ -289,28 +306,50 @@
         type: 'bar',
         data: {
           labels,
-          datasets: [{
-            label: 'Stock Goals',
-            data: goals,
-            backgroundColor: '#0EA5A4'
-          }]
+          datasets: [{ label: 'Stock Goals', data: goals, backgroundColor: '#0EA5A4' }]
         },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { display: false },
-            title: {
-              display: true,
-              text: 'Stock Goals Overview'
-            }
-          },
-          scales: {
-            y: { beginAtZero: true, ticks: { precision:0 } }
-          }
-        }
+        options: { responsive:true, plugins:{ legend:{display:false}, title:{display:true,text:'Stock Goals Overview'} }, scales:{ y:{beginAtZero:true,ticks:{precision:0}} } }
       });
+    }
+  }
+
+  // ==== Notifications ====
+  const bell = document.getElementById('notifBell');
+  const badge = document.getElementById('notifBadge');
+  const panel = document.getElementById('notifPanel');
+  const listEl = document.getElementById('notifList');
+
+  bell.addEventListener('click', ()=>{ 
+    panel.style.display = panel.style.display==='flex' ? 'none' : 'flex';
+  });
+
+  function updateNotifications(){
+    const lowItems = inventory.filter(it=>{
+      const goal = Number.isFinite(it.goal)?it.goal:0;
+      const qty = Number.isFinite(it.qty)?it.qty:0;
+      return goal>0 && qty<goal;
+    });
+    if(lowItems.length>0){
+      badge.textContent = lowItems.length;
+      badge.style.display = 'block';
+    } else {
+      badge.style.display = 'none';
+    }
+    listEl.innerHTML = '';
+    if(lowItems.length===0){
+      listEl.innerHTML = '<div class="notif-empty">All good — no low stock.</div>';
+    } else {
+      for(const item of lowItems){
+        const goal=item.goal||0, qty=item.qty||0;
+        const div=document.createElement('div');
+        div.className='notif-item low';
+        div.innerHTML=`<span>${escapeHtml(item.name)} is low (Stock: ${qty}, Goal: ${goal})</span>`;
+        listEl.appendChild(div);
+      }
     }
   }
 </script>
 </body>
 </html>
+
+
