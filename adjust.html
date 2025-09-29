@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -98,6 +97,21 @@
   #menu-check:checked~.sidebar{transform:translateX(0)}
   label.overlay{position:fixed;inset:0;background:rgba(0,0,0,.25);opacity:0;visibility:hidden;transition:.3s;z-index:1090}
   #menu-check:checked~label.overlay{opacity:1;visibility:visible}
+
+  /* Search row */
+  .search-row{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:8px 0 16px
+  }
+  .search-row .search-box{
+    flex:1 1 280px;display:flex;gap:8px;align-items:center
+  }
+  .search-row input[type="search"]{
+    width:100%;height:40px;border:2px solid var(--line);border-top:none;border-bottom:none;
+    background:transparent;box-shadow:7px 7px 0 0 var(--line);padding:10px;box-sizing:border-box
+  }
+  .pill{
+    background:var(--chip);border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:.85em;color:var(--ink)
+  }
 
   /* Cards / grid */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
@@ -205,7 +219,19 @@
 <main class="content">
   <section aria-labelledby="adjustPageTitle">
     <h2 id="adjustPageTitle">Adjust Stock</h2>
+
+    <!-- NEW: Search bar -->
+    <form class="search-row" role="search" aria-label="Search items" onsubmit="return false;">
+      <div class="search-box">
+        <label for="searchInput" class="visually-hidden" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden">Search items</label>
+        <input id="searchInput" type="search" placeholder="Search items by name (press / to focus)" autocomplete="off" />
+        <button id="clearSearchBtn" type="button" aria-label="Clear search">Clear</button>
+      </div>
+      <div class="pill" id="resultCount" aria-live="polite">0 items</div>
+    </form>
+
     <div id="stockGrid" class="grid"></div>
+    <p id="noResults" style="display:none;color:var(--muted);margin-top:8px">No items match your search.</p>
   </section>
 </main>
 
@@ -358,6 +384,35 @@
   let inventory = [];
   const lowState = new Map();
 
+  /* NEW: search state */
+  let searchQuery = '';
+  const searchInput = document.getElementById('searchInput');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+  const resultCountEl = document.getElementById('resultCount');
+  const noResultsEl = document.getElementById('noResults');
+
+  function setSearch(q){
+    searchQuery = (q || '').trim().toLowerCase();
+    renderStockGrid();
+  }
+  searchInput.addEventListener('input', (e)=> setSearch(e.target.value));
+  clearSearchBtn.addEventListener('click', ()=>{
+    searchInput.value='';
+    setSearch('');
+    searchInput.focus();
+  });
+
+  // Hotkey: press "/" to focus search (unless typing in an input/textarea or a modal is open)
+  window.addEventListener('keydown', (e)=>{
+    const tag = (document.activeElement?.tagName || '').toLowerCase();
+    const inField = tag==='input' || tag==='textarea' || tag==='select';
+    const anyModalOpen = document.querySelector('.modal.open');
+    if (e.key === '/' && !inField && !anyModalOpen){
+      e.preventDefault();
+      searchInput.focus();
+    }
+  });
+
   /* Live listeners */
   onSnapshot(colInventory, (snap) => { inventory = snap.docs.map(d => ({ id:d.id, ...d.data() })); renderStockGrid(); checkLowStockAlerts(); });
 
@@ -377,7 +432,17 @@
   function renderStockGrid() {
     const grid = document.getElementById('stockGrid'); if (!grid) return;
     grid.innerHTML = '';
-    inventory.forEach((item) => {
+
+    // Filter by search query (name only, case-insensitive)
+    const filtered = (searchQuery)
+      ? inventory.filter(it => (it.name || '').toString().toLowerCase().includes(searchQuery))
+      : inventory;
+
+    // Update result count + empty state
+    resultCountEl.textContent = `${filtered.length} item${filtered.length===1?'':'s'}`;
+    noResultsEl.style.display = filtered.length ? 'none' : 'block';
+
+    filtered.forEach((item) => {
       const total = totalQty(item);
       const isLow = (item.goal > 0) && (total <= item.goal);
       const card = document.createElement('div'); card.className = 'card';
@@ -641,4 +706,5 @@
 </script>
 </body>
 </html>
+
 
