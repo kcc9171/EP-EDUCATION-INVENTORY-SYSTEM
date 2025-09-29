@@ -113,6 +113,13 @@
     background:var(--chip);border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:.85em;color:var(--ink)
   }
 
+  /* Add row */
+  .add-row{
+    display:grid;
+    grid-template-columns:minmax(260px,1fr) 160px minmax(220px,1fr) auto;
+    gap:12px;align-items:center;max-width:900px;margin-bottom:10px
+  }
+
   /* Cards / grid */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
   .card{
@@ -221,8 +228,28 @@
   <section aria-labelledby="loanPageTitle">
     <h2 id="loanPageTitle">Loan</h2>
 
-    <!-- Search bar (same as Adjust) -->
-    <form class="search-row" role="search" aria-label="Search items" onsubmit="return false;">
+    <!-- NEW: Add New Loan Item -->
+    <div class="add-row">
+      <div class="input-container">
+        <input type="text" id="newLoanName" class="input" placeholder=" " autocomplete="off" />
+        <span class="topline"></span><span class="underline"></span>
+        <label for="newLoanName" class="label">Item Name (Loan)</label>
+      </div>
+      <input type="number" id="newLoanQty" placeholder="Quantity" min="1" inputmode="numeric" aria-label="Quantity" />
+      <div class="input-container">
+        <select id="newLoanLoc" class="input" style="height:40px">
+          <option>Old warehouse</option>
+          <option>New warehouse</option>
+          <option>Office</option>
+        </select>
+        <span class="topline"></span><span class="underline"></span>
+        <label for="newLoanLoc" class="label">Location</label>
+      </div>
+      <button id="addLoanBtn" aria-label="Add Loan Item">Add Item</button>
+    </div>
+
+    <!-- Search bar -->
+    <form class="search-row" role="search" aria-label="Search loan items" onsubmit="return false;">
       <div class="search-box">
         <label for="searchInput" class="visually-hidden" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden">Search items</label>
         <input id="searchInput" type="search" placeholder="Search items by name (press / to focus)" autocomplete="off" />
@@ -417,6 +444,42 @@
   /* Live listener — loads Loan inventory only */
   onSnapshot(colInventory, (snap) => { inventory = snap.docs.map(d => ({ id:d.id, ...d.data() })); renderStockGrid(); checkLowStockAlerts(); });
 
+  /* ===== Add New Loan Item ===== */
+  document.getElementById('addLoanBtn').addEventListener('click', addNewLoanItem);
+  async function addNewLoanItem(){
+    const name = (document.getElementById('newLoanName').value || '').trim().replace(/\s+/g,' ');
+    const qty  = parseInt(document.getElementById('newLoanQty').value,10);
+    const location = normLoc(document.getElementById('newLoanLoc').value);
+    if (!name || isNaN(qty) || qty <= 0) { notify("Enter a valid name and a quantity ≥ 1","warn"); return; }
+    if (!location) { notify('Location must be "Old warehouse", "New warehouse", or "Office".',"warn"); return; }
+
+    // find existing by case-insensitive name
+    const existing = inventory.find(i => (i.name||'').toLowerCase() === name.toLowerCase());
+    try{
+      if (existing){
+        const incOld    = location === 'Old warehouse' ? qty : 0;
+        const incNew    = location === 'New warehouse' ? qty : 0;
+        const incOffice = location === 'Office'         ? qty : 0;
+        const newOld    = Math.max(0, (existing.qtyOld ?? 0)    + incOld);
+        const newNew    = Math.max(0, (existing.qtyNew ?? 0)    + incNew);
+        const newOffice = Math.max(0, (existing.qtyOffice ?? 0) + incOffice);
+        await updateDoc(doc(db, "loanInventory", existing.id), {
+          qtyOld: newOld, qtyNew: newNew, qtyOffice: newOffice, qty: newOld + newNew + newOffice, isNew:true
+        });
+      } else {
+        const qtyOld    = location === 'Old warehouse' ? qty : 0;
+        const qtyNew    = location === 'New warehouse' ? qty : 0;
+        const qtyOffice = location === 'Office'         ? qty : 0;
+        await addDoc(colInventory, {
+          name, qtyOld, qtyNew, qtyOffice, qty: qtyOld + qtyNew + qtyOffice, goal:0, img:null, isNew:true, createdAt: serverTimestamp()
+        });
+      }
+      notify(`Loan item "${name}" added to ${location}.`);
+      document.getElementById('newLoanName').value = '';
+      document.getElementById('newLoanQty').value = '';
+    } catch(err){ console.error(err); notify('Failed to add loan item','error'); }
+  }
+
   /* Image viewer */
   const imageModal   = document.getElementById('imageModal');
   const imgView      = document.getElementById('img-view');
@@ -529,7 +592,6 @@
     document.getElementById('adj-amount').value = '1';
     document.getElementById('adj-location').value = 'Old warehouse';
 
-    // Prefill & lock the Account field with the signed-in user
     const accEl = document.getElementById('adj-account');
     if (accEl){
       accEl.value = CURRENT_USER;
@@ -537,7 +599,6 @@
       accEl.setAttribute('aria-readonly','true');
     }
 
-    // Clear the rest
     ['adj-purpose','adj-takenby'].forEach(id=>{
       const el=document.getElementById(id); if(el) el.value='';
     });
@@ -565,7 +626,6 @@
       const amt = parseInt(amountRaw, 10);
       const loc = normLoc(document.getElementById('adj-location').value);
 
-      // Account always = CURRENT_USER (do not read from the input to avoid tampering)
       const account = CURRENT_USER;
       const purpose = (document.getElementById('adj-purpose').value || '').trim();
       const takenBy = (document.getElementById('adj-takenby').value || '').trim();
@@ -604,8 +664,8 @@
         item: item.name, itemId: item.id,
         location: loc,
         delta,
-        actor: CURRENT_USER,   // who performed the action
-        account,               // locked to signed-in account
+        actor: CURRENT_USER,
+        account,
         purpose, takenBy,
         qtyAfterOld: newOld, qtyAfterNew: newNew, qtyAfterOffice: newOffice, qtyAfter: newTotal
       });
@@ -707,5 +767,3 @@
 </script>
 </body>
 </html>
-
-
